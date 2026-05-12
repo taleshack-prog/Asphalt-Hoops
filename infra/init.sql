@@ -45,10 +45,10 @@ CREATE TABLE IF NOT EXISTS chat_messages (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Seed: 4 quadras públicas em São Paulo
+-- Seed: quadras públicas de Porto Alegre
 INSERT INTO courts (name, address, city, lat, lng) VALUES
-  ('Quadra do Ibirapuera',    'Av. Pedro Álvares Cabral, s/n',   'São Paulo', -23.5873, -46.6573),
-  ('Quadra da Aclimação',     'R. Muniz de Souza, 1119',         'São Paulo', -23.5627, -46.6305),
-  ('Quadra do Pacaembu',      'Praça Charles Miller, s/n',       'São Paulo', -23.5285, -46.6613),
-  ('Quadra do Anhangabaú',    'Viaduto do Chá, s/n',             'São Paulo', -23.5458, -46.6394)
+  ('Quadra da Redenção',        'Parque Farroupilha, s/n',        'Porto Alegre', -30.0353, -51.2177),
+  ('Quadra do Parque Marinha',  'Av. Edvaldo Pereira Paiva, s/n', 'Porto Alegre', -30.0419, -51.2344),
+  ('Quadra da Av. Ipiranga',    'Av. Ipiranga, 5811',             'Porto Alegre', -30.0629, -51.1755),
+  ('Quadra do Parque Germânia', 'Av. Padre Cacique, s/n',         'Porto Alegre', -30.0633, -51.2189)
 ON CONFLICT DO NOTHING;
