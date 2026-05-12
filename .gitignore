@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+.expo/
+mobile/.expo/
+mobile/dist/
+.env
+backend/.env
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/
+*.log
+npm-debug.log*
