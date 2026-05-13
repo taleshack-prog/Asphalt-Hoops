@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import MapView, { Marker, Callout } from 'react-native-maps';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { apiFetch } from '../services/api';
 
 interface Court {
@@ -8,8 +7,6 @@ interface Court {
   name: string;
   address: string;
   city: string;
-  lat: number;
-  lng: number;
 }
 
 export default function MapScreen({ navigation }: any) {
@@ -23,52 +20,39 @@ export default function MapScreen({ navigation }: any) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <View style={s.center}>
-        <ActivityIndicator color="#F97316" size="large" />
-      </View>
-    );
-  }
+  if (loading) return (
+    <View style={s.center}>
+      <ActivityIndicator color="#F97316" size="large" />
+    </View>
+  );
 
   return (
     <View style={s.container}>
-      <MapView
-        style={s.map}
-        initialRegion={{
-          latitude: -23.5505,
-          longitude: -46.6333,
-          latitudeDelta: 0.15,
-          longitudeDelta: 0.15,
-        }}
-      >
-        {courts.map((court) => (
-          <Marker
-            key={court.id}
-            coordinate={{ latitude: Number(court.lat), longitude: Number(court.lng) }}
-            title={court.name}
-            pinColor="#F97316"
-          >
-            <Callout onPress={() => navigation.navigate('CourtDetail', { court })}>
-              <View style={s.callout}>
-                <Text style={s.calloutTitle}>🏀 {court.name}</Text>
-                <Text style={s.calloutAddr}>{court.address}</Text>
-                <Text style={s.calloutAction}>Ver partidas →</Text>
-              </View>
-            </Callout>
-          </Marker>
-        ))}
-      </MapView>
+      <Text style={s.title}>🏀 Quadras em Porto Alegre</Text>
+      <FlatList
+        data={courts}
+        keyExtractor={(c) => String(c.id)}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={s.card} onPress={() => navigation.navigate('CourtDetail', { court: item })}>
+            <Text style={s.courtName}>{item.name}</Text>
+            <Text style={s.address}>{item.address}</Text>
+            <Text style={s.city}>{item.city}</Text>
+          </TouchableOpacity>
+        )}
+      />
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1 },
-  map: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#111', padding: 16 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#111' },
-  callout: { width: 200, padding: 8 },
-  calloutTitle: { fontWeight: 'bold', fontSize: 14, marginBottom: 4 },
-  calloutAddr: { color: '#666', fontSize: 12, marginBottom: 6 },
-  calloutAction: { color: '#F97316', fontWeight: 'bold', fontSize: 13 },
+  title: { color: '#F97316', fontSize: 20, fontWeight: 'bold', marginBottom: 16, marginTop: 8 },
+  card: {
+    backgroundColor: '#1c1c1e', borderRadius: 12, padding: 16,
+    marginBottom: 10, borderWidth: 1, borderColor: '#333',
+  },
+  courtName: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  address: { color: '#aaa', fontSize: 13, marginTop: 4 },
+  city: { color: '#F97316', fontSize: 12, marginTop: 2 },
 });
