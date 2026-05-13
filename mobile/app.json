@@ -1,31 +1,36 @@
 {
   "expo": {
-    "name": "Asphalt Hoops",
+    "name": "mobile",
     "slug": "asphalt-hoops",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#111111"
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
     },
     "android": {
-      "package": "com.taleshack.asphalthoops",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#111111"
-      }
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
     },
-    "owner": "taleshack",
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
     "extra": {
       "eas": {
         "projectId": "da122454-3b41-4ad7-b8a0-682b051e47f6"
       }
     },
-    "updates": {
-      "enabled": false
-    }
+    "owner": "taleshack"
   }
 }
