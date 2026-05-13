@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = 'http://localhost:3001'; // troque pelo IP do backend em produção
+const SOCKET_URL = 'https://asphalt-hoops-production.up.railway.app'; // troque pelo IP do backend em produção
 
 let socket: Socket | null = null;
 

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const API_BASE = 'http://localhost:3001/api'; // troque pelo IP do backend em produção
+export const API_BASE = 'https://asphalt-hoops-production.up.railway.app/api'; // troque pelo IP do backend em produção
 
 export async function apiFetch<T = any>(
   path: string,
