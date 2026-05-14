@@ -8,41 +8,45 @@ import { connectSocket } from '../services/socket';
 import { useAuth } from '../services/AuthContext';
 
 interface Message {
-  id: number;
-  message: string;
-  name: string;
-  user_id: number;
-  created_at: string;
-}
-
-interface Player {
-  id: number;
-  name: string;
+  id: number; message: string; name: string;
+  user_id: number; created_at: string;
 }
 
 export default function ChatScreen({ route }: any) {
-  const { match, courtName } = route.params;
+  const { match, courtName, groupId, groupName, isGeneral } = route.params;
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const flatRef = useRef<FlatList>(null);
   const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Determina o tipo de chat
+  const chatType = isGeneral ? 'general' : groupId ? 'group' : 'match';
+  const chatTitle = isGeneral ? '🌐 Chat Geral' : groupName ? `👥 ${groupName}` : `🏀 ${courtName}`;
+  const room = isGeneral ? 'general' : groupId ? `group_${groupId}` : `match_${match?.id}`;
+
   useEffect(() => {
-    apiFetch(`/matches/${match.id}`)
-      .then((d) => {
-        setMessages(d.messages ?? []);
-        setPlayers(d.players ?? []);
-      })
-      .finally(() => setLoading(false));
+    // Carrega histórico
+    if (chatType === 'general') {
+      apiFetch('/chat/general').then(setMessages).finally(() => setLoading(false));
+    } else if (chatType === 'group') {
+      apiFetch(`/chat/groups/${groupId}/messages`).then(setMessages).finally(() => setLoading(false));
+    } else {
+      apiFetch(`/matches/${match.id}`).then((d) => { setMessages(d.messages ?? []); }).finally(() => setLoading(false));
+    }
 
     const sock = connectSocket(user!.id);
-    sock.emit('join_match_chat', match.id);
 
-    sock.on('new_message', (msg: Message) => {
+    if (chatType === 'general') sock.emit('join_general');
+    else if (chatType === 'group') sock.emit('join_group_chat', groupId);
+    else sock.emit('join_match_chat', match.id);
+
+    const msgEvent = chatType === 'general' ? 'new_general_message'
+      : chatType === 'group' ? 'new_group_message' : 'new_message';
+
+    sock.on(msgEvent, (msg: Message) => {
       setMessages((prev) => [...prev, msg]);
       setTimeout(() => flatRef.current?.scrollToEnd({ animated: true }), 100);
     });
@@ -55,54 +59,43 @@ export default function ChatScreen({ route }: any) {
     });
 
     return () => {
-      sock.emit('leave_match_chat', match.id);
-      sock.off('new_message');
+      if (chatType === 'group') sock.emit('leave_group_chat', groupId);
+      else if (chatType === 'match') sock.emit('leave_match_chat', match.id);
+      sock.off(msgEvent);
       sock.off('user_typing');
     };
   }, []);
 
-  function handleTyping() {
-    const sock = connectSocket(user!.id);
-    sock.emit('typing', { matchId: match.id, userName: user!.name });
-  }
-
   function sendMessage() {
     if (!text.trim()) return;
     const sock = connectSocket(user!.id);
-    sock.emit('send_message', {
-      matchId: match.id,
-      userId: user!.id,
-      message: text.trim(),
-    });
+    if (chatType === 'general') {
+      sock.emit('send_general_message', { userId: user!.id, message: text.trim() });
+    } else if (chatType === 'group') {
+      sock.emit('send_group_message', { groupId, userId: user!.id, message: text.trim() });
+    } else {
+      sock.emit('send_match_message', { matchId: match.id, userId: user!.id, message: text.trim() });
+    }
     setText('');
+  }
+
+  function handleTyping() {
+    const sock = connectSocket(user!.id);
+    sock.emit('typing', { room, userName: user!.name });
   }
 
   const formatTime = (iso: string) =>
     new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-  const formatDate = (iso: string) =>
-    new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
-
   return (
-    <KeyboardAvoidingView
-      style={s.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={90}
-    >
-      {/* Header */}
+    <KeyboardAvoidingView style={s.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
       <View style={s.header}>
-        <Text style={s.headerTitle}>🏀 {courtName}</Text>
-        <Text style={s.headerSub}>{formatDate(match.scheduled_at)} • {match.modality}</Text>
-        <Text style={s.headerPlayers}>
-          Jogadores: {players.map((p) => p.name).join(', ') || 'Nenhum ainda'}
-        </Text>
+        <Text style={s.headerTitle}>{chatTitle}</Text>
+        {match && <Text style={s.headerSub}>{new Date(match.scheduled_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })} • {match.modality}</Text>}
       </View>
 
-      {/* Messages */}
       {loading ? (
-        <View style={s.center}>
-          <ActivityIndicator color="#F97316" />
-        </View>
+        <View style={s.center}><ActivityIndicator color="#F97316" /></View>
       ) : (
         <FlatList
           ref={flatRef}
@@ -110,13 +103,11 @@ export default function ChatScreen({ route }: any) {
           keyExtractor={(m) => String(m.id)}
           contentContainerStyle={s.messageList}
           onContentSizeChange={() => flatRef.current?.scrollToEnd({ animated: false })}
-          ListEmptyComponent={
-            <Text style={s.empty}>Nenhuma mensagem ainda{'\n'}Diga olá! 👋</Text>
-          }
+          ListEmptyComponent={<Text style={s.empty}>Nenhuma mensagem ainda{'\n'}Diga olá! 👋</Text>}
           renderItem={({ item }) => {
             const isMe = item.user_id === user!.id;
             return (
-              <View style={[s.bubbleWrapper, isMe ? s.bubbleWrapperMe : s.bubbleWrapperThem]}>
+              <View style={[s.bubbleWrapper, isMe ? s.bwMe : s.bwThem]}>
                 {!isMe && <Text style={s.bubbleName}>{item.name}</Text>}
                 <View style={[s.bubble, isMe ? s.bubbleMe : s.bubbleThem]}>
                   <Text style={s.bubbleText}>{item.message}</Text>
@@ -128,20 +119,13 @@ export default function ChatScreen({ route }: any) {
         />
       )}
 
-      {typingUser && (
-        <Text style={s.typing}>{typingUser} está digitando...</Text>
-      )}
+      {typingUser && <Text style={s.typing}>{typingUser} está digitando...</Text>}
 
-      {/* Input */}
       <View style={s.inputRow}>
         <TextInput
-          style={s.input}
-          placeholder="Mensagem..."
-          placeholderTextColor="#555"
-          value={text}
-          onChangeText={(t) => { setText(t); handleTyping(); }}
-          multiline
-          maxLength={500}
+          style={s.input} placeholder="Mensagem..." placeholderTextColor="#555"
+          value={text} onChangeText={(t) => { setText(t); handleTyping(); }}
+          multiline maxLength={500}
         />
         <TouchableOpacity style={s.sendBtn} onPress={sendMessage}>
           <Text style={s.sendBtnText}>▶</Text>
@@ -153,19 +137,14 @@ export default function ChatScreen({ route }: any) {
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#111' },
-  header: {
-    backgroundColor: '#1c1c1e', padding: 12,
-    borderBottomWidth: 1, borderColor: '#333',
-  },
-  headerTitle: { color: '#F97316', fontWeight: 'bold', fontSize: 15 },
+  header: { backgroundColor: '#1c1c1e', padding: 12, borderBottomWidth: 1, borderColor: '#333' },
+  headerTitle: { color: '#F97316', fontWeight: 'bold', fontSize: 16 },
   headerSub: { color: '#888', fontSize: 12, marginTop: 2 },
-  headerPlayers: { color: '#aaa', fontSize: 11, marginTop: 4 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   messageList: { padding: 12, paddingBottom: 8 },
   empty: { color: '#555', textAlign: 'center', marginTop: 40, lineHeight: 24 },
   bubbleWrapper: { marginBottom: 8, maxWidth: '80%' },
-  bubbleWrapperMe: { alignSelf: 'flex-end' },
-  bubbleWrapperThem: { alignSelf: 'flex-start' },
+  bwMe: { alignSelf: 'flex-end' }, bwThem: { alignSelf: 'flex-start' },
   bubbleName: { color: '#aaa', fontSize: 11, marginBottom: 3, marginLeft: 4 },
   bubble: { borderRadius: 16, padding: 10 },
   bubbleMe: { backgroundColor: '#F97316' },
@@ -173,18 +152,8 @@ const s = StyleSheet.create({
   bubbleText: { color: '#fff', fontSize: 15 },
   bubbleTime: { color: 'rgba(255,255,255,0.5)', fontSize: 10, textAlign: 'right', marginTop: 4 },
   typing: { color: '#888', fontSize: 12, paddingHorizontal: 16, paddingBottom: 4 },
-  inputRow: {
-    flexDirection: 'row', padding: 10, borderTopWidth: 1,
-    borderColor: '#333', backgroundColor: '#1c1c1e', alignItems: 'flex-end',
-  },
-  input: {
-    flex: 1, backgroundColor: '#111', color: '#fff', borderRadius: 20,
-    paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, maxHeight: 100,
-    borderWidth: 1, borderColor: '#333',
-  },
-  sendBtn: {
-    backgroundColor: '#F97316', borderRadius: 22, width: 44, height: 44,
-    justifyContent: 'center', alignItems: 'center', marginLeft: 8,
-  },
+  inputRow: { flexDirection: 'row', padding: 10, borderTopWidth: 1, borderColor: '#333', backgroundColor: '#1c1c1e', alignItems: 'flex-end' },
+  input: { flex: 1, backgroundColor: '#111', color: '#fff', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, maxHeight: 100, borderWidth: 1, borderColor: '#333' },
+  sendBtn: { backgroundColor: '#F97316', borderRadius: 22, width: 44, height: 44, justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
   sendBtnText: { color: '#fff', fontSize: 18 },
 });
