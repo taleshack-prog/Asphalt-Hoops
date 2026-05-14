@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
+  StyleSheet, ActivityIndicator, Alert,
+  KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
 import { apiFetch } from '../services/api';
 import { useAuth } from '../services/AuthContext';
@@ -11,71 +12,121 @@ export default function RegisterScreen({ navigation, route }: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // Pré-preenche código de convite se vier via deep link
   const [inviteCode, setInviteCode] = useState(route?.params?.code ?? '');
   const [loading, setLoading] = useState(false);
 
   async function handleRegister() {
-    if (!name || !email || !password) {
-      Alert.alert('Preencha todos os campos');
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      Alert.alert('Atenção', 'Preencha todos os campos obrigatórios');
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert('Atenção', 'Senha deve ter pelo menos 6 caracteres');
       return;
     }
     setLoading(true);
     try {
       const { token, user } = await apiFetch('/auth/register', {
         method: 'POST',
-        body: JSON.stringify({ name, email, password, invite_code: inviteCode }),
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+          invite_code: inviteCode.trim() || undefined,
+        }),
       });
       await signIn(token, user);
     } catch (e: any) {
-      Alert.alert('Erro', e.message);
+      Alert.alert('Erro', e.message ?? 'Erro ao cadastrar');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <KeyboardAvoidingView style={s.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Text style={s.logo}>🏀 Asphalt Hoops</Text>
-      <Text style={s.subtitle}>Crie sua conta</Text>
+    <KeyboardAvoidingView
+      style={s.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView contentContainerStyle={s.inner} keyboardShouldPersistTaps="handled">
+        <View style={s.logoContainer}>
+          <Text style={s.logo}>🏀</Text>
+          <Text style={s.appName}>Asphalt Hoops</Text>
+          <Text style={s.tagline}>Crie sua conta</Text>
+        </View>
 
-      <TextInput style={s.input} placeholder="Nome" placeholderTextColor="#666" value={name} onChangeText={setName} />
-      <TextInput
-        style={s.input} placeholder="Email" placeholderTextColor="#666"
-        value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none"
-      />
-      <TextInput
-        style={s.input} placeholder="Senha" placeholderTextColor="#666"
-        value={password} onChangeText={setPassword} secureTextEntry
-      />
-      <TextInput
-        style={s.input} placeholder="Código de convite (opcional)" placeholderTextColor="#666"
-        value={inviteCode} onChangeText={setInviteCode} autoCapitalize="characters"
-      />
+        <View style={s.form}>
+          <TextInput
+            style={s.input}
+            placeholder="Nome completo *"
+            placeholderTextColor="#555"
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="words"
+          />
+          <TextInput
+            style={s.input}
+            placeholder="Email *"
+            placeholderTextColor="#555"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <TextInput
+            style={s.input}
+            placeholder="Senha (mín. 6 caracteres) *"
+            placeholderTextColor="#555"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <TextInput
+            style={[s.input, s.inviteInput]}
+            placeholder="Código de convite (opcional)"
+            placeholderTextColor="#555"
+            value={inviteCode}
+            onChangeText={setInviteCode}
+            autoCapitalize="characters"
+            maxLength={10}
+          />
 
-      <TouchableOpacity style={s.btn} onPress={handleRegister} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.btnText}>Cadastrar</Text>}
-      </TouchableOpacity>
+          <TouchableOpacity style={s.btn} onPress={handleRegister} disabled={loading}>
+            {loading
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={s.btnText}>Criar Conta</Text>
+            }
+          </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={s.link}>Já tem conta? Entrar</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={s.loginBtn} onPress={() => navigation.goBack()}>
+            <Text style={s.loginText}>Já tem conta? <Text style={s.loginLink}>Entrar</Text></Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111', justifyContent: 'center', padding: 24 },
-  logo: { fontSize: 32, fontWeight: 'bold', color: '#F97316', textAlign: 'center', marginBottom: 8 },
-  subtitle: { color: '#aaa', textAlign: 'center', marginBottom: 32, fontSize: 16 },
+  container: { flex: 1, backgroundColor: '#111' },
+  inner: { flex: 1, justifyContent: 'center', padding: 24 },
+  logoContainer: { alignItems: 'center', marginBottom: 40 },
+  logo: { fontSize: 60, marginBottom: 8 },
+  appName: { color: '#F97316', fontSize: 28, fontWeight: 'bold' },
+  tagline: { color: '#666', fontSize: 14, marginTop: 4 },
+  form: { gap: 12 },
   input: {
-    backgroundColor: '#1c1c1e', color: '#fff', borderRadius: 10,
-    padding: 14, marginBottom: 12, fontSize: 16, borderWidth: 1, borderColor: '#333',
+    backgroundColor: '#1c1c1e', color: '#fff', borderRadius: 12,
+    padding: 16, fontSize: 16, borderWidth: 1, borderColor: '#333',
   },
+  inviteInput: { borderColor: '#F97316', borderWidth: 1.5 },
   btn: {
-    backgroundColor: '#F97316', borderRadius: 10,
+    backgroundColor: '#F97316', borderRadius: 12,
     padding: 16, alignItems: 'center', marginTop: 8,
   },
   btnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  link: { color: '#F97316', textAlign: 'center', marginTop: 20, fontSize: 14 },
+  loginBtn: { alignItems: 'center', marginTop: 16 },
+  loginText: { color: '#666', fontSize: 14 },
+  loginLink: { color: '#F97316', fontWeight: 'bold' },
 });
