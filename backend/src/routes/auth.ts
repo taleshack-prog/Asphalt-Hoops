@@ -2,10 +2,10 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { pool } from '../db';
+import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
-/** Gera código de convite único (8 chars) */
 function genInviteCode(): string {
   return Math.random().toString(36).toUpperCase().slice(2, 10);
 }
@@ -13,72 +13,59 @@ function genInviteCode(): string {
 // POST /api/auth/register
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
   const { name, email, password, invite_code: inviteCode } = req.body;
-
   if (!name || !email || !password) {
     res.status(400).json({ error: 'name, email e password são obrigatórios' });
     return;
   }
-
   try {
     const hash = await bcrypt.hash(password, 10);
     const code = genInviteCode();
-
-    // Resolve quem convidou
     let invitedBy: number | null = null;
     if (inviteCode) {
       const inv = await pool.query('SELECT id FROM users WHERE invite_code = $1', [inviteCode]);
       if (inv.rows[0]) invitedBy = inv.rows[0].id;
     }
-
     const result = await pool.query(
       `INSERT INTO users (name, email, password, invite_code, invited_by)
        VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, invite_code`,
       [name, email, hash, code, invitedBy]
     );
-
     const user = result.rows[0];
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, { expiresIn: '30d' });
-
     res.status(201).json({ token, user });
   } catch (err: any) {
-    if (err.code === '23505') {
-      res.status(409).json({ error: 'Email já cadastrado' });
-    } else {
-      console.error(err);
-      res.status(500).json({ error: 'Erro interno' });
-    }
+    if (err.code === '23505') res.status(409).json({ error: 'Email já cadastrado' });
+    else { console.error(err); res.status(500).json({ error: 'Erro interno' }); }
   }
 });
 
 // POST /api/auth/login
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    res.status(400).json({ error: 'email e password obrigatórios' });
-    return;
-  }
-
+  if (!email || !password) { res.status(400).json({ error: 'email e password obrigatórios' }); return; }
   try {
     const result = await pool.query(
-      'SELECT id, name, email, password, invite_code FROM users WHERE email = $1',
-      [email]
+      'SELECT id, name, email, password, invite_code FROM users WHERE email = $1', [email]
     );
-
     const user = result.rows[0];
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      res.status(401).json({ error: 'Credenciais inválidas' });
-      return;
+      res.status(401).json({ error: 'Credenciais inválidas' }); return;
     }
-
     const { password: _, ...safeUser } = user;
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, { expiresIn: '30d' });
-
     res.json({ token, user: safeUser });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro interno' });
-  }
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro interno' }); }
+});
+
+// GET /api/auth/users — lista todos os usuários (para convites)
+router.get('/users', authMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const result = await pool.query(
+      'SELECT id, name, email, invite_code FROM users WHERE id != $1 ORDER BY name',
+      [req.userId]
+    );
+    res.json(result.rows);
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Erro interno' }); }
 });
 
 export default router;
