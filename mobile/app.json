@@ -23,6 +23,9 @@
       "eas": {
         "projectId": "da122454-3b41-4ad7-b8a0-682b051e47f6"
       }
-    }
+    },
+    "plugins": [
+      "@maplibre/maplibre-react-native"
+    ]
   }
 }
