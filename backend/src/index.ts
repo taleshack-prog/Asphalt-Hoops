@@ -8,82 +8,104 @@ import { pool } from './db';
 import authRoutes from './routes/auth';
 import courtsRoutes from './routes/courts';
 import matchesRoutes from './routes/matches';
+import chatRoutes from './routes/chat';
 
 const app = express();
 const server = http.createServer(app);
 
-// ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 
-// ─── REST Routes ─────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/courts', courtsRoutes);
 app.use('/api/matches', matchesRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// ─── Socket.io — Chat por Partida ────────────────────────────────────────────
-const io = new Server(server, {
-  cors: { origin: '*' },
-});
+const io = new Server(server, { cors: { origin: '*' } });
 
 io.on('connection', (socket) => {
-  console.log(`🔌 Socket conectado: ${socket.id}`);
+  console.log(`🔌 ${socket.id} conectado`);
 
-  // Usuário entra na sala da partida
+  // ── Chat da Partida ──────────────────────────────
   socket.on('join_match_chat', (matchId: number) => {
-    socket.join(`chat_${matchId}`);
-    console.log(`👤 ${socket.id} entrou em chat_${matchId}`);
+    socket.join(`match_${matchId}`);
   });
 
-  // Usuário sai da sala
   socket.on('leave_match_chat', (matchId: number) => {
-    socket.leave(`chat_${matchId}`);
+    socket.leave(`match_${matchId}`);
   });
 
-  // Recebe mensagem e faz broadcast na sala
-  socket.on('send_message', async (data: { matchId: number; userId: number; message: string }) => {
+  socket.on('send_match_message', async (data: { matchId: number; userId: number; message: string }) => {
     if (!data.matchId || !data.userId || !data.message?.trim()) return;
-
     try {
       const result = await pool.query(
         `INSERT INTO chat_messages (match_id, user_id, message)
-         VALUES ($1, $2, $3)
-         RETURNING id, message, created_at`,
+         VALUES ($1, $2, $3) RETURNING id, message, created_at`,
         [data.matchId, data.userId, data.message.trim()]
       );
-
-      const userResult = await pool.query(
-        'SELECT name FROM users WHERE id = $1',
-        [data.userId]
-      );
-
-      const msg = {
-        ...result.rows[0],
-        name: userResult.rows[0]?.name ?? 'Anônimo',
-        user_id: data.userId,
-      };
-
-      // Envia para todos na sala (incluindo remetente)
-      io.to(`chat_${data.matchId}`).emit('new_message', msg);
-    } catch (err) {
-      console.error('Erro ao salvar mensagem:', err);
-      socket.emit('error', { message: 'Falha ao enviar mensagem' });
-    }
+      const user = await pool.query('SELECT name FROM users WHERE id = $1', [data.userId]);
+      io.to(`match_${data.matchId}`).emit('new_message', {
+        ...result.rows[0], name: user.rows[0]?.name, user_id: data.userId,
+      });
+    } catch (err) { console.error(err); }
   });
 
-  // Typing indicator
-  socket.on('typing', (data: { matchId: number; userName: string }) => {
-    socket.to(`chat_${data.matchId}`).emit('user_typing', { userName: data.userName });
+  // ── Chat Geral ───────────────────────────────────
+  socket.on('join_general', () => {
+    socket.join('general');
+  });
+
+  socket.on('send_general_message', async (data: { userId: number; message: string }) => {
+    if (!data.userId || !data.message?.trim()) return;
+    try {
+      const result = await pool.query(
+        `INSERT INTO chat_messages (user_id, message, is_general)
+         VALUES ($1, $2, TRUE) RETURNING id, message, created_at`,
+        [data.userId, data.message.trim()]
+      );
+      const user = await pool.query('SELECT name FROM users WHERE id = $1', [data.userId]);
+      io.to('general').emit('new_general_message', {
+        ...result.rows[0], name: user.rows[0]?.name, user_id: data.userId,
+      });
+    } catch (err) { console.error(err); }
+  });
+
+  // ── Chat de Grupo ────────────────────────────────
+  socket.on('join_group_chat', (groupId: number) => {
+    socket.join(`group_${groupId}`);
+  });
+
+  socket.on('leave_group_chat', (groupId: number) => {
+    socket.leave(`group_${groupId}`);
+  });
+
+  socket.on('send_group_message', async (data: { groupId: number; userId: number; message: string }) => {
+    if (!data.groupId || !data.userId || !data.message?.trim()) return;
+    try {
+      const result = await pool.query(
+        `INSERT INTO chat_messages (group_id, user_id, message)
+         VALUES ($1, $2, $3) RETURNING id, message, created_at`,
+        [data.groupId, data.userId, data.message.trim()]
+      );
+      const user = await pool.query('SELECT name FROM users WHERE id = $1', [data.userId]);
+      io.to(`group_${data.groupId}`).emit('new_group_message', {
+        ...result.rows[0], name: user.rows[0]?.name, user_id: data.userId,
+      });
+    } catch (err) { console.error(err); }
+  });
+
+  // ── Typing ───────────────────────────────────────
+  socket.on('typing', (data: { room: string; userName: string }) => {
+    socket.to(data.room).emit('user_typing', { userName: data.userName });
   });
 
   socket.on('disconnect', () => {
-    console.log(`🔌 Socket desconectado: ${socket.id}`);
+    console.log(`🔌 ${socket.id} desconectado`);
   });
 });
 
-// ─── Start ────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT ?? 3001;
 server.listen(PORT, () => {
   console.log(`🚀 Asphalt Hoops backend rodando na porta ${PORT}`);
