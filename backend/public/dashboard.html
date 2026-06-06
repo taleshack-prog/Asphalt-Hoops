@@ -14,34 +14,33 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .topbar-left{display:flex;align-items:center;gap:12px;}
 .topbar-logo{font-size:26px;}
-.topbar-title{font-size:19px;font-weight:800;color:var(--orange);letter-spacing:-0.5px;}
+.topbar-title{font-size:19px;font-weight:800;color:var(--orange);}
 .topbar-sub{font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;}
-.topbar-right{display:flex;gap:10px;}
 .btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;transition:all .2s;}
 .btn:hover{border-color:var(--orange);color:var(--orange);}
 .btn-primary{background:var(--orange);color:#fff;border-color:var(--orange);}
 .btn-primary:hover{opacity:.85;color:#fff;}
 .btn-danger{border-color:var(--red);color:var(--red);}
 .main{padding:24px 28px;max-width:1600px;margin:0 auto;}
-.tabs{display:flex;gap:4px;margin-bottom:28px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;width:fit-content;}
-.tab{padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:all .2s;border:none;background:none;font-family:'Syne',sans-serif;}
+.tabs{display:flex;gap:4px;margin-bottom:28px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;flex-wrap:wrap;}
+.tab{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);transition:all .2s;border:none;background:none;font-family:'Syne',sans-serif;}
 .tab.active{background:var(--orange);color:#fff;}
 .section{display:none;}.section.active{display:block;}
-.section-label{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:3px;text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:14px;}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:32px;}
-.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;cursor:default;transition:border-color .2s;}
+.slabel{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:3px;text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:14px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s;}
 .kpi:hover{border-color:var(--orange);}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent,var(--orange)),transparent);}
-.kpi-icon{font-size:24px;margin-bottom:10px;}
-.kpi-val{font-size:38px;font-weight:800;line-height:1;margin-bottom:4px;}
-.kpi-label{font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;letter-spacing:1px;}
+.kpi-icon{font-size:22px;margin-bottom:10px;}
+.kpi-val{font-size:36px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-label{font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;}
 .kpi-delta{font-size:11px;color:var(--green);margin-top:6px;font-family:'Space Mono',monospace;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;}
 @media(max-width:900px){.grid2{grid-template-columns:1fr;}}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
-.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+.card-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .card-title{font-size:14px;font-weight:700;}
-.badge{background:var(--bg3);border:1px solid var(--border);padding:2px 10px;border-radius:20px;font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;}
+.bdg{background:var(--bg3);border:1px solid var(--border);padding:2px 10px;border-radius:20px;font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;}
 table{width:100%;border-collapse:collapse;}
 th{padding:9px 20px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border);}
 td{padding:11px 20px;font-size:13px;border-bottom:1px solid var(--border);}
@@ -49,42 +48,29 @@ tr:last-child td{border-bottom:none;}
 tr:hover td{background:var(--bg3);}
 .rank{color:var(--orange);font-weight:700;font-family:'Space Mono',monospace;}
 .pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-.pill-orange{background:#F9731620;color:var(--orange);}
-.pill-green{background:#22C55E20;color:var(--green);}
-.pill-blue{background:#3B82F620;color:var(--blue);}
-.pill-purple{background:#A855F720;color:var(--purple);}
-.pill-red{background:#EF444420;color:var(--red);}
+.po{background:#F9731620;color:var(--orange);}
+.pg{background:#22C55E20;color:var(--green);}
+.pb{background:#3B82F620;color:var(--blue);}
+.pp{background:#A855F720;color:var(--purple);}
+.pr{background:#EF444420;color:var(--red);}
 .chart-wrap{padding:20px;}
-.chart-bars{display:flex;align-items:flex-end;gap:6px;height:100px;}
-.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
-.chart-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;}
-.chart-bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--orange),#C2570F);min-height:3px;}
+.chart-bars{display:flex;align-items:flex-end;gap:5px;height:100px;}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.chart-bw{flex:1;width:100%;display:flex;align-items:flex-end;}
+.chart-b{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--orange),#C2570F);min-height:3px;}
 .chart-lbl{font-size:9px;color:var(--text2);font-family:'Space Mono',monospace;}
-.chart-val{font-size:10px;color:var(--orange);font-weight:700;font-family:'Space Mono',monospace;}
+.chart-v{font-size:10px;color:var(--orange);font-weight:700;font-family:'Space Mono',monospace;}
 .empty{color:var(--text3);text-align:center;padding:24px;font-family:'Space Mono',monospace;font-size:12px;}
 .loading{color:var(--text2);padding:16px 20px;font-family:'Space Mono',monospace;font-size:12px;}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px;animation:pulse 2s infinite;}
+.sd{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-/* Blog editor */
-.blog-form{padding:20px;display:flex;flex-direction:column;gap:12px;}
-.inp{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:10px;font-size:14px;font-family:'Syne',sans-serif;outline:none;width:100%;transition:border-color .2s;}
+.inp{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:10px;font-size:14px;font-family:'Syne',sans-serif;outline:none;width:100%;transition:border-color .2s;}
 .inp:focus{border-color:var(--orange);}
-textarea.inp{min-height:140px;resize:vertical;}
-.blog-list{padding:0;}
+textarea.inp{min-height:120px;resize:vertical;}
 .blog-item{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
 .blog-item:last-child{border-bottom:none;}
-.blog-item-info{flex:1;}
-.blog-item-title{font-size:14px;font-weight:700;margin-bottom:4px;}
-.blog-item-meta{font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;}
-.blog-item-preview{font-size:12px;color:var(--text3);margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.blog-item-actions{display:flex;gap:8px;flex-shrink:0;}
-/* Invite tree */
 .tree-node{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
 .tree-node:last-child{border-bottom:none;}
-.tree-indent{color:var(--text3);font-family:'Space Mono',monospace;font-size:12px;min-width:20px;}
-.tree-name{font-size:13px;font-weight:600;}
-.tree-code{font-size:11px;color:var(--orange);font-family:'Space Mono',monospace;}
-.tree-count{font-size:11px;color:var(--green);margin-left:auto;}
 </style>
 </head>
 <body>
@@ -93,29 +79,26 @@ textarea.inp{min-height:140px;resize:vertical;}
     <div class="topbar-logo">🏀</div>
     <div>
       <div class="topbar-title">Asphalt Hoops</div>
-      <div class="topbar-sub"><span class="status-dot"></span>ADMIN DASHBOARD</div>
+      <div class="topbar-sub"><span class="sd"></span>ADMIN DASHBOARD</div>
     </div>
   </div>
-  <div class="topbar-right">
-    <button class="btn" onclick="loadAll()">↻ Atualizar</button>
-  </div>
+  <button class="btn" id="refresh-btn">↻ Atualizar</button>
 </div>
 
 <div class="main">
-  <!-- Tabs -->
   <div class="tabs">
-    <button class="tab active" onclick="showTab('overview')">📊 Visão Geral</button>
-    <button class="tab" onclick="showTab('users')">👥 Usuários</button>
-    <button class="tab" onclick="showTab('games')">📅 Jogos</button>
-    <button class="tab" onclick="showTab('viral')">🎟️ Viralização</button>
-    <button class="tab" onclick="showTab('blog')">📰 Blog</button>
-    <button class="tab" onclick="showTab('heatmap')">🔥 Mapa de Calor</button>
-    <button class="tab" onclick="showTab('manage')">⚙️ Gestão</button>
+    <button class="tab active" id="tab-btn-overview">📊 Visão Geral</button>
+    <button class="tab" id="tab-btn-users">👥 Usuários</button>
+    <button class="tab" id="tab-btn-games">📅 Jogos</button>
+    <button class="tab" id="tab-btn-viral">🎟️ Viralização</button>
+    <button class="tab" id="tab-btn-heatmap">🔥 Mapa de Calor</button>
+    <button class="tab" id="tab-btn-blog">📰 Blog</button>
+    <button class="tab" id="tab-btn-manage">⚙️ Gestão</button>
   </div>
 
-  <!-- VISÃO GERAL -->
-  <div id="tab-overview" class="section active">
-    <div class="section-label">KPIs Principais</div>
+  <!-- OVERVIEW -->
+  <div id="sec-overview" class="section active">
+    <div class="slabel">KPIs Principais</div>
     <div class="kpi-grid">
       <div class="kpi" style="--accent:#F97316"><div class="kpi-icon">👥</div><div class="kpi-val" id="k-users">—</div><div class="kpi-label">USUÁRIOS</div><div class="kpi-delta" id="k-users-d"></div></div>
       <div class="kpi" style="--accent:#22C55E"><div class="kpi-icon">📅</div><div class="kpi-val" id="k-matches">—</div><div class="kpi-label">PARTIDAS</div></div>
@@ -124,674 +107,370 @@ textarea.inp{min-height:140px;resize:vertical;}
       <div class="kpi" style="--accent:#F59E0B"><div class="kpi-icon">👥</div><div class="kpi-val" id="k-groups">—</div><div class="kpi-label">GRUPOS</div></div>
       <div class="kpi" style="--accent:#EC4899"><div class="kpi-icon">🎟️</div><div class="kpi-val" id="k-invites">—</div><div class="kpi-label">VIA CONVITE</div></div>
     </div>
-
-    <div class="section-label">Crescimento (14 dias)</div>
-    <div class="card" style="margin-bottom:24px">
-      <div class="card-header"><div class="card-title">📈 Novos usuários por dia</div></div>
-      <div class="chart-wrap"><div class="chart-bars" id="growth-chart"><div class="loading">Carregando...</div></div></div>
-    </div>
-
+    <div class="slabel">Crescimento (14 dias)</div>
+    <div class="card"><div class="card-header"><div class="card-title">📈 Novos usuários por dia</div></div><div class="chart-wrap"><div class="chart-bars" id="growth-chart"><div class="loading">Carregando...</div></div></div></div>
     <div class="grid2">
-      <div class="card">
-        <div class="card-header"><div class="card-title">🗺️ Quadras mais usadas</div><div class="badge" id="b-courts">—</div></div>
-        <table><thead><tr><th>#</th><th>Quadra</th><th>Jogos</th></tr></thead><tbody id="t-courts"><tr><td colspan="3" class="loading">...</td></tr></tbody></table>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">📅 Partidas por modalidade</div><div class="badge" id="b-mod">—</div></div>
-        <table><thead><tr><th>#</th><th>Modalidade</th><th>Total</th></tr></thead><tbody id="t-mod"><tr><td colspan="3" class="loading">...</td></tr></tbody></table>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">💬 Mensagens por dia (7d)</div><div class="badge" id="b-chat">7 dias</div></div>
-        <table><thead><tr><th>Data</th><th>Mensagens</th></tr></thead><tbody id="t-chat"><tr><td colspan="2" class="loading">...</td></tr></tbody></table>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">📍 Quadras adicionadas por usuários</div><div class="badge" id="b-ucourts">—</div></div>
-        <table><thead><tr><th>Quadra</th><th>Por</th></tr></thead><tbody id="t-ucourts"><tr><td colspan="2" class="loading">...</td></tr></tbody></table>
+      <div class="card"><div class="card-header"><div class="card-title">🗺️ Quadras mais usadas</div><div class="bdg" id="b-courts">—</div></div><table><thead><tr><th>#</th><th>Quadra</th><th>Jogos</th></tr></thead><tbody id="t-courts"></tbody></table></div>
+      <div class="card"><div class="card-header"><div class="card-title">📅 Por modalidade</div><div class="bdg" id="b-mod">—</div></div><table><thead><tr><th>#</th><th>Modalidade</th><th>Total</th></tr></thead><tbody id="t-mod"></tbody></table></div>
+      <div class="card"><div class="card-header"><div class="card-title">💬 Mensagens (7d)</div></div><table><thead><tr><th>Data</th><th>Msgs</th></tr></thead><tbody id="t-chat"></tbody></table></div>
+      <div class="card"><div class="card-header"><div class="card-title">📍 Quadras por usuários</div><div class="bdg" id="b-ucourts">—</div></div><table><thead><tr><th>Quadra</th><th>Por</th></tr></thead><tbody id="t-ucourts"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div id="sec-users" class="section">
+    <div class="card"><div class="card-header"><div class="card-title">👥 Cadastros recentes</div><div class="bdg" id="b-newusers">—</div></div><table><thead><tr><th>Nome</th><th>Email</th><th>Data</th><th>Via</th><th>Código</th></tr></thead><tbody id="t-newusers"></tbody></table></div>
+    <div class="card"><div class="card-header"><div class="card-title">📍 Jogos por bairro</div><div class="bdg" id="b-bairro">—</div></div><table><thead><tr><th>#</th><th>Bairro</th><th>Jogos</th><th>Quadras</th></tr></thead><tbody id="t-bairro"></tbody></table></div>
+  </div>
+
+  <!-- GAMES -->
+  <div id="sec-games" class="section">
+    <div class="grid2">
+      <div class="card"><div class="card-header"><div class="card-title">📅 Todos os jogos</div><div class="bdg" id="b-allmatches">—</div></div><table><thead><tr><th>Quadra</th><th>Mod.</th><th>Data</th><th>Jog.</th></tr></thead><tbody id="t-allmatches"></tbody></table></div>
+      <div class="card"><div class="card-header"><div class="card-title">🏆 Jogadores mais ativos</div></div><table><thead><tr><th>#</th><th>Jogador</th><th>Jogos</th></tr></thead><tbody id="t-active"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- VIRAL -->
+  <div id="sec-viral" class="section">
+    <div class="grid2">
+      <div class="card"><div class="card-header"><div class="card-title">🏆 Top Convidadores</div><div class="bdg" id="b-inviters">—</div></div><table><thead><tr><th>#</th><th>Jogador</th><th>Código</th><th>Convidados</th></tr></thead><tbody id="t-inviters"></tbody></table></div>
+      <div class="card"><div class="card-header"><div class="card-title">🌳 Árvore de Viralização</div></div><div id="t-tree" class="loading" style="padding:16px 20px">Carregando...</div></div>
+    </div>
+    <div class="card"><div class="card-header"><div class="card-title">📊 Funil de Conversão</div></div>
+      <div style="padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="background:#F9731630;border-left:4px solid var(--orange);padding:12px 16px;border-radius:6px"><b>Total:</b> <span id="f-total">—</span></div>
+        <div style="background:#22C55E20;border-left:4px solid var(--green);padding:12px 16px;border-radius:6px"><b>Via convite:</b> <span id="f-invite">—</span> <span id="f-invite-pct" style="color:var(--green);font-family:'Space Mono',monospace;font-size:12px"></span></div>
+        <div style="background:#3B82F620;border-left:4px solid var(--blue);padding:12px 16px;border-radius:6px"><b>Cadastro direto:</b> <span id="f-direct">—</span> <span id="f-direct-pct" style="color:var(--blue);font-family:'Space Mono',monospace;font-size:12px"></span></div>
+        <div style="background:#A855F720;border-left:4px solid var(--purple);padding:12px 16px;border-radius:6px"><b>Marcaram pelo menos 1 jogo:</b> <span id="f-active">—</span></div>
       </div>
     </div>
   </div>
 
-  <!-- USUÁRIOS -->
-  <div id="tab-users" class="section">
-    <div class="section-label">Últimos Cadastros</div>
-    <div class="card" style="margin-bottom:24px">
-      <div class="card-header"><div class="card-title">👥 Usuários recentes</div><div class="badge" id="b-newusers">—</div></div>
-      <table><thead><tr><th>Nome</th><th>Email</th><th>Cadastro</th><th>Via</th><th>Código</th></tr></thead><tbody id="t-newusers"><tr><td colspan="5" class="loading">...</td></tr></tbody></table>
-    </div>
-
-    <div class="section-label">Adesão por Bairro</div>
+  <!-- HEATMAP -->
+  <div id="sec-heatmap" class="section">
+    <div class="slabel">Intensidade de uso por praça</div>
     <div class="card">
-      <div class="card-header"><div class="card-title">📍 Jogos por bairro (quadras)</div><div class="badge" id="b-bairro">—</div></div>
-      <table><thead><tr><th>#</th><th>Bairro / Região</th><th>Jogos</th><th>Quadras</th></tr></thead><tbody id="t-bairro"><tr><td colspan="4" class="loading">...</td></tr></tbody></table>
+      <div class="card-header"><div class="card-title">🔥 Mapa de Calor</div><div style="display:flex;gap:8px;font-size:11px;align-items:center"><span style="color:#3B82F6">● Sem jogos</span><span style="color:#F59E0B">● Baixo</span><span style="color:#F97316">● Médio</span><span style="color:#EF4444">● Alto</span></div></div>
+      <div id="heatmap-div" style="height:480px"></div>
     </div>
-  </div>
-
-  <!-- JOGOS -->
-  <div id="tab-games" class="section">
-    <div class="grid2">
-      <div class="card">
-        <div class="card-header"><div class="card-title">📅 Todos os jogos marcados</div><div class="badge" id="b-allmatches">—</div></div>
-        <table><thead><tr><th>Quadra</th><th>Modalidade</th><th>Data</th><th>Jogadores</th></tr></thead><tbody id="t-allmatches"><tr><td colspan="4" class="loading">...</td></tr></tbody></table>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">🏆 Jogadores mais ativos</div></div>
-        <table><thead><tr><th>#</th><th>Jogador</th><th>Jogos</th></tr></thead><tbody id="t-activeplayers"><tr><td colspan="3" class="loading">...</td></tr></tbody></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- VIRALIZAÇÃO -->
-  <div id="tab-viral" class="section">
-    <div class="section-label">Controle de Convites & Compartilhamentos</div>
-    <div class="grid2">
-      <div class="card">
-        <div class="card-header"><div class="card-title">🏆 Top Convidadores</div><div class="badge" id="b-inviters">—</div></div>
-        <table><thead><tr><th>#</th><th>Jogador</th><th>Código</th><th>Convidados</th></tr></thead><tbody id="t-inviters"><tr><td colspan="4" class="loading">...</td></tr></tbody></table>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">🌳 Árvore de Viralização</div></div>
-        <div id="t-tree" class="loading" style="padding:16px 20px">Carregando...</div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:20px">
-      <div class="card-header"><div class="card-title">📊 Funil de Conversão</div></div>
-      <div id="t-funnel" style="padding:20px">
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div id="funnel-total" style="background:#F9731630;border-left:4px solid var(--orange);padding:12px 16px;border-radius:6px">
-            <span style="font-weight:700">Total de usuários: </span><span id="f-total">—</span>
-          </div>
-          <div id="funnel-invite" style="background:#22C55E20;border-left:4px solid var(--green);padding:12px 16px;border-radius:6px">
-            <span style="font-weight:700">Vieram por convite: </span><span id="f-invite">—</span><span id="f-invite-pct" style="color:var(--green);margin-left:8px;font-family:'Space Mono',monospace;font-size:12px"></span>
-          </div>
-          <div id="funnel-direct" style="background:#3B82F620;border-left:4px solid var(--blue);padding:12px 16px;border-radius:6px">
-            <span style="font-weight:700">Cadastro direto: </span><span id="f-direct">—</span><span id="f-direct-pct" style="color:var(--blue);margin-left:8px;font-family:'Space Mono',monospace;font-size:12px"></span>
-          </div>
-          <div id="funnel-active" style="background:#A855F720;border-left:4px solid var(--purple);padding:12px 16px;border-radius:6px">
-            <span style="font-weight:700">Marcaram pelo menos 1 jogo: </span><span id="f-active">—</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="card"><div class="card-header"><div class="card-title">📊 Ranking de Praças</div><div class="bdg" id="b-heatrank">—</div></div><table><thead><tr><th>#</th><th>Praça</th><th>Bairro</th><th>Jogos</th><th>Nível</th></tr></thead><tbody id="t-heatrank"></tbody></table></div>
   </div>
 
   <!-- BLOG -->
-  <div id="tab-blog" class="section">
+  <div id="sec-blog" class="section">
     <div class="grid2">
       <div class="card">
-        <div class="card-header">
-          <div class="card-title">✏️ Novo Post</div>
-        </div>
-        <div class="blog-form">
-          <input id="post-title" class="inp" placeholder="Título do post..." maxlength="200"/>
-          <textarea id="post-content" class="inp" placeholder="Conteúdo do post...&#10;&#10;Use Enter para parágrafos."></textarea>
-          <input id="post-author" class="inp" placeholder="Autor (padrão: Asphalt Hoops)" value="Asphalt Hoops"/>
-          <input id="admin-key" class="inp" placeholder="Chave admin (ADMIN_KEY)..." type="password"/>
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-primary" onclick="createPost()" style="flex:1;padding:12px">📤 Publicar Post</button>
-            <button class="btn" onclick="clearPostForm()" style="padding:12px">Limpar</button>
-          </div>
+        <div class="card-header"><div class="card-title">✏️ Novo Post</div></div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+          <input id="post-title" class="inp" placeholder="Título..."/>
+          <textarea id="post-content" class="inp" placeholder="Conteúdo..."></textarea>
+          <input id="post-author" class="inp" placeholder="Autor" value="Asphalt Hoops"/>
+          <input id="admin-key" class="inp" type="password" placeholder="Chave admin (ADMIN_KEY)..."/>
+          <button class="btn btn-primary" id="publish-btn" style="padding:12px">📤 Publicar</button>
           <div id="post-msg" style="font-size:13px;text-align:center;display:none"></div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">📰 Posts Publicados</div><div class="badge" id="b-posts">—</div></div>
-        <div id="t-posts" class="blog-list"><div class="loading">Carregando...</div></div>
-      </div>
+      <div class="card"><div class="card-header"><div class="card-title">📰 Posts</div><div class="bdg" id="b-posts">—</div></div><div id="t-posts"><div class="loading">Carregando...</div></div></div>
     </div>
   </div>
 
-  <!-- MAPA DE CALOR -->
-  <div id="tab-heatmap" class="section">
-    <div class="section-label">Intensidade de uso por praça</div>
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header"><div class="card-title">🔥 Mapa de Calor — Jogos por Quadra</div><div class="badge">Porto Alegre</div></div>
-      <div id="heatmap" style="height:500px;border-radius:0 0 14px 14px"></div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">📊 Ranking de Praças</div><div class="badge" id="b-heatranking">—</div></div>
-      <table><thead><tr><th>#</th><th>Praça / Quadra</th><th>Bairro</th><th>Jogos</th><th>Intensidade</th></tr></thead>
-      <tbody id="t-heatranking"><tr><td colspan="5" class="loading">...</td></tr></tbody></table>
-    </div>
-  </div>
-
-  <!-- GESTÃO -->
-  <div id="tab-manage" class="section">
-    <div class="section-label">Gestão de Usuários</div>
+  <!-- MANAGE -->
+  <div id="sec-manage" class="section">
     <div class="card">
       <div class="card-header">
-        <div class="card-title">👥 Usuários Cadastrados</div>
+        <div class="card-title">👥 Todos os Usuários</div>
         <div style="display:flex;gap:8px;align-items:center">
           <input id="manage-key" class="inp" type="password" placeholder="Chave admin..." style="width:180px;padding:6px 10px;font-size:12px"/>
-          <div class="badge" id="b-manage">—</div>
+          <div class="bdg" id="b-manage">—</div>
         </div>
       </div>
-      <table>
-        <thead><tr><th>Nome</th><th>Email</th><th>Cadastro</th><th>Via</th><th>Código</th><th>Ação</th></tr></thead>
-        <tbody id="t-manage"><tr><td colspan="6" class="loading">...</td></tr></tbody>
-      </table>
+      <table><thead><tr><th>Nome</th><th>Email</th><th>Data</th><th>Via</th><th>Código</th><th>Ação</th></tr></thead><tbody id="t-manage"></tbody></table>
     </div>
   </div>
 </div>
 
 <script>
-const API = 'https://asphalt-hoops-production.up.railway.app/api';
-let TOKEN = '';
+var API = 'https://asphalt-hoops-production.up.railway.app/api';
+var TOKEN = '';
+var heatmapInited = false;
 
-async function getToken() {
-  if (TOKEN) return TOKEN;
-  try {
-    const r = await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'admin@asphalthoops.app',password:'admin123'})});
-    const d = await r.json(); TOKEN = d.token||''; return TOKEN;
-  } catch { return ''; }
+// ── Helpers ────────────────────────────────────────────────
+function getToken(cb) {
+  if (TOKEN) { cb(TOKEN); return; }
+  fetch(API+'/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'admin@asphalthoops.app',password:'admin123'})})
+    .then(function(r){return r.json();})
+    .then(function(d){TOKEN=d.token||'';cb(TOKEN);})
+    .catch(function(){cb('');});
 }
 
-async function api(path) {
-  const t = await getToken();
-  const r = await fetch(API+path, { headers: t ? {Authorization:'Bearer '+t} : {} });
-  return r.json();
+function apiGet(path, cb) {
+  getToken(function(t) {
+    fetch(API+path, {headers: t ? {Authorization:'Bearer '+t} : {}})
+      .then(function(r){return r.json();})
+      .then(cb)
+      .catch(function(e){console.error(path, e);});
+  });
 }
+
+function apiDelete(path, key, cb) {
+  fetch(API+path, {method:'DELETE', headers:{'x-admin-key':key}})
+    .then(function(r){return r.json();})
+    .then(cb)
+    .catch(function(e){console.error(e);});
+}
+
+function apiPost(path, body, key, cb) {
+  var headers = {'Content-Type':'application/json'};
+  if (key) headers['x-admin-key'] = key;
+  fetch(API+path, {method:'POST', headers:headers, body:JSON.stringify(body)})
+    .then(function(r){return r.json();})
+    .then(cb)
+    .catch(function(e){console.error(e);});
+}
+
+function el(id) { return document.getElementById(id); }
+function html(id, h) { var e=el(id); if(e) e.innerHTML=h; }
+function txt(id, t) { var e=el(id); if(e) e.textContent=t; }
+
+// ── Tabs ───────────────────────────────────────────────────
+var tabs = ['overview','users','games','viral','heatmap','blog','manage'];
 
 function showTab(name) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  event.target.classList.add('active');
+  tabs.forEach(function(t) {
+    var s = el('sec-'+t);
+    var b = el('tab-btn-'+t);
+    if (s) s.className = 'section' + (t===name?' active':'');
+    if (b) b.className = 'tab' + (t===name?' active':'');
+  });
   loadTab(name);
 }
 
 function loadTab(name) {
-  if (name==='overview') 
-// ── HEATMAP ─────────────────────────────────────────────────
-let heatmapMap = null;
-
-async function loadHeatmap() {
-  if (!heatmapMap) {
-    setTimeout(() => {
-      heatmapMap = L.map('heatmap').setView([-30.0353, -51.2177], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap', maxZoom: 19
-      }).addTo(heatmapMap);
-      fetchHeatData();
-    }, 100);
-  } else {
-    fetchHeatData();
-  }
-}
-
-async function fetchHeatData() {
-  try {
-    const d = await api('/dashboard/courts/heatmap');
-    if (!d.rows?.length) return;
-
-    // Heatmap points [lat, lng, intensity]
-    const max = Math.max(...d.rows.map(r => +r.match_count), 1);
-    const points = d.rows.map(r => [+r.lat, +r.lng, (+r.match_count / max)]);
-
-    // Círculos de calor por intensidade
-    const max2 = Math.max(...d.rows.map(r => +r.match_count), 1);
-    d.rows.forEach(r => {
-      const count = +r.match_count;
-      const pct = count / max2;
-      const color = pct >= 0.7 ? '#EF4444' : pct >= 0.4 ? '#F97316' : pct >= 0.1 ? '#F59E0B' : '#3B82F6';
-      const radius = count === 0 ? 8 : Math.max(10, Math.min(35, count * 4 + 8));
-      L.circleMarker([+r.lat, +r.lng], {
-        radius, fillColor: color, fillOpacity: count === 0 ? 0.2 : 0.7,
-        color: '#fff', weight: count === 0 ? 1 : 2
-      }).addTo(heatmapMap).bindPopup(`<b>🏀 ${r.name}</b><br><span style="color:${color};font-weight:700">${count} jogo${count!==1?'s':''} marcado${count!==1?'s':''}</span><br><small>${(r.address||'').split('—')[1]?.trim()||''}</small>`);
-    });
-
-    // Ranking
-    document.getElementById('b-heatranking').textContent = d.rows.length + ' quadras';
-    const t = document.getElementById('t-heatranking');
-    const bars = {'high':'pill-red','mid':'pill-orange','low':'pill-blue'};
-    t.innerHTML = d.rows.map((r, i) => {
-      const count = +r.match_count;
-      const level = count >= 5 ? 'high' : count >= 2 ? 'mid' : 'low';
-      const label = count >= 5 ? '🔥 Alta' : count >= 2 ? '⚡ Média' : '❄️ Baixa';
-      const bairro = (r.address||'').split('—')[1]?.trim() || '—';
-      return `<tr>
-        <td class="rank">${i+1}</td>
-        <td>${r.name}</td>
-        <td style="font-size:12px;color:var(--text2)">${bairro}</td>
-        <td><span class="pill pill-green">${count}</span></td>
-        <td><span class="pill ${bars[level]}">${label}</span></td>
-      </tr>`;
-    }).join('');
-  } catch(e) { console.error(e); }
-}
-
-// ── MANAGE ──────────────────────────────────────────────────
-async function loadManage() {
-  try {
-    const d = await api('/dashboard/users/all');
-    document.getElementById('b-manage').textContent = (d.rows?.length||0) + ' usuários';
-    const t = document.getElementById('t-manage');
-    if (!d.rows?.length) { t.innerHTML = '<tr><td colspan="6" class="empty">Sem usuários</td></tr>'; return; }
-    t.innerHTML = d.rows.map(r => `<tr>
-      <td>${r.name}</td>
-      <td style="font-size:11px;color:var(--text2)">${r.email}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${new Date(r.created_at).toLocaleDateString('pt-BR')}</td>
-      <td>${r.invited_by ? '<span class="pill pill-orange">Convite</span>' : '<span class="pill pill-blue">Direto</span>'}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--orange)">${r.invite_code}</td>
-      <td><button class="btn btn-danger" onclick="deleteUser(${r.id},'${r.email}')" style="padding:4px 10px;font-size:11px">🗑️ Deletar</button></td>
-    </tr>`).join('');
-  } catch(e) { console.error(e); }
-}
-
-async function deleteUser(id, email) {
-  const key = document.getElementById('manage-key').value.trim();
-  if (!key) { alert('Informe a chave admin'); return; }
-  if (!confirm('Deletar usuário ' + email + '?\n\nIsso também remove seus jogos e mensagens.')) return;
-  try {
-    const r = await fetch(API + '/dashboard/users/' + id, {
-      method: 'DELETE',
-      headers: { 'x-admin-key': key }
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    loadManage();
-  } catch(e) { alert('Erro: ' + e.message); }
-}
-
-loadOverview();
+  if (name==='overview') loadOverview();
   else if (name==='users') loadUsers();
   else if (name==='games') loadGames();
   else if (name==='viral') loadViral();
-  else if (name==='blog') loadBlog();
   else if (name==='heatmap') loadHeatmap();
+  else if (name==='blog') loadBlog();
   else if (name==='manage') loadManage();
 }
 
-async function loadAll() { 
-// ── HEATMAP ─────────────────────────────────────────────────
-let heatmapMap = null;
+tabs.forEach(function(t) {
+  var b = el('tab-btn-'+t);
+  if (b) b.addEventListener('click', function(){ showTab(t); });
+});
 
-async function loadHeatmap() {
-  if (!heatmapMap) {
-    setTimeout(() => {
-      heatmapMap = L.map('heatmap').setView([-30.0353, -51.2177], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap', maxZoom: 19
-      }).addTo(heatmapMap);
-      fetchHeatData();
-    }, 100);
-  } else {
-    fetchHeatData();
-  }
-}
+el('refresh-btn').addEventListener('click', function() { loadTab(tabs.find(function(t){ return el('sec-'+t).classList.contains('active'); })||'overview'); });
 
-async function fetchHeatData() {
-  try {
-    const d = await api('/dashboard/courts/heatmap');
-    if (!d.rows?.length) return;
+// ── OVERVIEW ───────────────────────────────────────────────
+function loadOverview() {
+  apiGet('/dashboard/users/count', function(u) {
+    txt('k-users', u.count||'—');
+    txt('k-invites', u.via_invite||'—');
+    if (u.today>0) txt('k-users-d', '+'+u.today+' hoje');
+  });
+  apiGet('/dashboard/matches/count', function(d){ txt('k-matches', d.count||'—'); });
+  apiGet('/dashboard/courts/count', function(d){ txt('k-courts', d.count||'—'); });
+  apiGet('/dashboard/messages/count', function(d){ txt('k-msgs', d.count||'—'); txt('k-groups', d.groups||'—'); });
 
-    // Heatmap points [lat, lng, intensity]
-    const max = Math.max(...d.rows.map(r => +r.match_count), 1);
-    const points = d.rows.map(r => [+r.lat, +r.lng, (+r.match_count / max)]);
-
-    // Círculos de calor por intensidade
-    const max2 = Math.max(...d.rows.map(r => +r.match_count), 1);
-    d.rows.forEach(r => {
-      const count = +r.match_count;
-      const pct = count / max2;
-      const color = pct >= 0.7 ? '#EF4444' : pct >= 0.4 ? '#F97316' : pct >= 0.1 ? '#F59E0B' : '#3B82F6';
-      const radius = count === 0 ? 8 : Math.max(10, Math.min(35, count * 4 + 8));
-      L.circleMarker([+r.lat, +r.lng], {
-        radius, fillColor: color, fillOpacity: count === 0 ? 0.2 : 0.7,
-        color: '#fff', weight: count === 0 ? 1 : 2
-      }).addTo(heatmapMap).bindPopup(`<b>🏀 ${r.name}</b><br><span style="color:${color};font-weight:700">${count} jogo${count!==1?'s':''} marcado${count!==1?'s':''}</span><br><small>${(r.address||'').split('—')[1]?.trim()||''}</small>`);
-    });
-
-    // Ranking
-    document.getElementById('b-heatranking').textContent = d.rows.length + ' quadras';
-    const t = document.getElementById('t-heatranking');
-    const bars = {'high':'pill-red','mid':'pill-orange','low':'pill-blue'};
-    t.innerHTML = d.rows.map((r, i) => {
-      const count = +r.match_count;
-      const level = count >= 5 ? 'high' : count >= 2 ? 'mid' : 'low';
-      const label = count >= 5 ? '🔥 Alta' : count >= 2 ? '⚡ Média' : '❄️ Baixa';
-      const bairro = (r.address||'').split('—')[1]?.trim() || '—';
-      return `<tr>
-        <td class="rank">${i+1}</td>
-        <td>${r.name}</td>
-        <td style="font-size:12px;color:var(--text2)">${bairro}</td>
-        <td><span class="pill pill-green">${count}</span></td>
-        <td><span class="pill ${bars[level]}">${label}</span></td>
-      </tr>`;
+  apiGet('/dashboard/users/growth', function(d) {
+    var el2 = el('growth-chart');
+    if (!d.days||!d.days.length) { el2.innerHTML='<div class="empty">Sem dados</div>'; return; }
+    var max = 1;
+    d.days.forEach(function(x){ if(+x.count>max) max=+x.count; });
+    el2.innerHTML = d.days.map(function(x){
+      return '<div class="chart-col"><div class="chart-v">'+(x.count||'')+'</div><div class="chart-bw"><div class="chart-b" style="height:'+Math.max((x.count/max)*100,3)+'%"></div></div><div class="chart-lbl">'+x.label+'</div></div>';
     }).join('');
-  } catch(e) { console.error(e); }
+  });
+
+  apiGet('/dashboard/courts/top', function(d) {
+    txt('b-courts', (d.rows&&d.rows.length||0)+' quadras');
+    html('t-courts', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td><span class="pill pg">'+r.match_count+'</span></td></tr>'; }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
+  });
+
+  apiGet('/dashboard/matches/modalities', function(d) {
+    var b={'1x1':'pb','2x2':'pp','3x3':'po','5x5':'pg'};
+    txt('b-mod', (d.rows&&d.rows.length||0)+' tipos');
+    html('t-mod', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td><span class="pill '+(b[r.modality]||'po')+'">'+r.modality+'</span></td><td>'+r.count+'</td></tr>'; }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
+  });
+
+  apiGet('/dashboard/messages/daily', function(d) {
+    html('t-chat', d.rows&&d.rows.length ? d.rows.map(function(r){ return '<tr><td style="font-family:Space Mono,monospace;font-size:12px">'+r.date+'</td><td>'+r.count+'</td></tr>'; }).join('') : '<tr><td colspan="2" class="empty">Sem dados</td></tr>');
+  });
+
+  apiGet('/dashboard/courts/user-added', function(d) {
+    txt('b-ucourts', (d.rows&&d.rows.length||0)+' novas');
+    html('t-ucourts', d.rows&&d.rows.length ? d.rows.map(function(r){ return '<tr><td>'+r.court_name+'</td><td>'+(r.added_by_name||'Anônimo')+'</td></tr>'; }).join('') : '<tr><td colspan="2" class="empty">Nenhuma</td></tr>');
+  });
 }
 
-// ── MANAGE ──────────────────────────────────────────────────
-async function loadManage() {
-  try {
-    const d = await api('/dashboard/users/all');
-    document.getElementById('b-manage').textContent = (d.rows?.length||0) + ' usuários';
-    const t = document.getElementById('t-manage');
-    if (!d.rows?.length) { t.innerHTML = '<tr><td colspan="6" class="empty">Sem usuários</td></tr>'; return; }
-    t.innerHTML = d.rows.map(r => `<tr>
-      <td>${r.name}</td>
-      <td style="font-size:11px;color:var(--text2)">${r.email}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${new Date(r.created_at).toLocaleDateString('pt-BR')}</td>
-      <td>${r.invited_by ? '<span class="pill pill-orange">Convite</span>' : '<span class="pill pill-blue">Direto</span>'}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--orange)">${r.invite_code}</td>
-      <td><button class="btn btn-danger" onclick="deleteUser(${r.id},'${r.email}')" style="padding:4px 10px;font-size:11px">🗑️ Deletar</button></td>
-    </tr>`).join('');
-  } catch(e) { console.error(e); }
+// ── USERS ──────────────────────────────────────────────────
+function loadUsers() {
+  apiGet('/dashboard/users/recent', function(d) {
+    txt('b-newusers', (d.rows&&d.rows.length||0)+' recentes');
+    html('t-newusers', d.rows&&d.rows.length ? d.rows.map(function(r){ return '<tr><td>'+r.name+'</td><td style="font-size:11px;color:var(--text2)">'+r.email+'</td><td style="font-family:Space Mono,monospace;font-size:11px;color:var(--text2)">'+new Date(r.created_at).toLocaleDateString('pt-BR')+'</td><td>'+(r.invited_by?'<span class="pill po">Convite</span>':'<span class="pill pb">Direto</span>')+'</td><td style="font-family:Space Mono,monospace;font-size:12px;color:var(--orange)">'+r.invite_code+'</td></tr>'; }).join('') : '<tr><td colspan="5" class="empty">Sem usuários</td></tr>');
+  });
+  apiGet('/dashboard/courts/by-neighborhood', function(d) {
+    txt('b-bairro', (d.rows&&d.rows.length||0)+' regiões');
+    html('t-bairro', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.neighborhood+'</td><td><span class="pill pg">'+r.match_count+'</span></td><td>'+r.court_count+'</td></tr>'; }).join('') : '<tr><td colspan="4" class="empty">Sem dados</td></tr>');
+  });
 }
 
-async function deleteUser(id, email) {
-  const key = document.getElementById('manage-key').value.trim();
-  if (!key) { alert('Informe a chave admin'); return; }
-  if (!confirm('Deletar usuário ' + email + '?\n\nIsso também remove seus jogos e mensagens.')) return;
-  try {
-    const r = await fetch(API + '/dashboard/users/' + id, {
-      method: 'DELETE',
-      headers: { 'x-admin-key': key }
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    loadManage();
-  } catch(e) { alert('Erro: ' + e.message); }
+// ── GAMES ──────────────────────────────────────────────────
+function loadGames() {
+  apiGet('/dashboard/matches/all', function(d) {
+    var b={'1x1':'pb','2x2':'pp','3x3':'po','5x5':'pg'};
+    txt('b-allmatches', (d.rows&&d.rows.length||0)+' jogos');
+    html('t-allmatches', d.rows&&d.rows.length ? d.rows.map(function(r){ return '<tr><td>'+r.court_name+'</td><td><span class="pill '+(b[r.modality]||'po')+'">'+r.modality+'</span></td><td style="font-family:Space Mono,monospace;font-size:11px">'+new Date(r.scheduled_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</td><td>'+r.player_count+'/'+r.max_players+'</td></tr>'; }).join('') : '<tr><td colspan="4" class="empty">Sem jogos</td></tr>');
+  });
+  apiGet('/dashboard/users/most-active', function(d) {
+    html('t-active', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td><span class="pill po">'+r.match_count+' jogos</span></td></tr>'; }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
+  });
 }
 
-loadOverview(); }
-
-// ── OVERVIEW ────────────────────────────────────────────────
-async function loadOverview() {
-  try {
-    const [u,m,c,msg] = await Promise.all([api('/dashboard/users/count'),api('/dashboard/matches/count'),api('/dashboard/courts/count'),api('/dashboard/messages/count')]);
-    document.getElementById('k-users').textContent = u.count??'—';
-    document.getElementById('k-matches').textContent = m.count??'—';
-    document.getElementById('k-courts').textContent = c.count??'—';
-    document.getElementById('k-msgs').textContent = msg.count??'—';
-    document.getElementById('k-groups').textContent = msg.groups??'—';
-    document.getElementById('k-invites').textContent = u.via_invite??'—';
-    if (u.today>0) document.getElementById('k-users-d').textContent = '+'+u.today+' hoje';
-  } catch {}
-
-  try {
-    const d = await api('/dashboard/users/growth');
-    const el = document.getElementById('growth-chart');
-    if (!d.days?.length) { el.innerHTML='<div class="empty">Sem dados</div>'; return; }
-    const max = Math.max(...d.days.map(x=>x.count),1);
-    el.innerHTML = d.days.map(x=>`<div class="chart-col"><div class="chart-val">${x.count||''}</div><div class="chart-bar-wrap"><div class="chart-bar" style="height:${Math.max((x.count/max)*100,3)}%"></div></div><div class="chart-lbl">${x.label}</div></div>`).join('');
-  } catch {}
-
-  try {
-    const d = await api('/dashboard/courts/top');
-    document.getElementById('b-courts').textContent=(d.rows?.length||0)+' quadras';
-    const t=document.getElementById('t-courts');
-    if(!d.rows?.length){t.innerHTML='<tr><td colspan="3" class="empty">Sem dados</td></tr>';return;}
-    t.innerHTML=d.rows.map((r,i)=>`<tr><td class="rank">${i+1}</td><td>${r.name}</td><td><span class="pill pill-green">${r.match_count}</span></td></tr>`).join('');
-  } catch {}
-
-  try {
-    const d = await api('/dashboard/matches/modalities');
-    document.getElementById('b-mod').textContent=(d.rows?.length||0)+' tipos';
-    const b={'1x1':'pill-blue','2x2':'pill-purple','3x3':'pill-orange','5x5':'pill-green'};
-    const t=document.getElementById('t-mod');
-    if(!d.rows?.length){t.innerHTML='<tr><td colspan="3" class="empty">Sem dados</td></tr>';return;}
-    t.innerHTML=d.rows.map((r,i)=>`<tr><td class="rank">${i+1}</td><td><span class="pill ${b[r.modality]||'pill-orange'}">${r.modality}</span></td><td>${r.count}</td></tr>`).join('');
-  } catch {}
-
-  try {
-    const d = await api('/dashboard/messages/daily');
-    document.getElementById('b-chat').textContent='7 dias';
-    const t=document.getElementById('t-chat');
-    if(!d.rows?.length){t.innerHTML='<tr><td colspan="2" class="empty">Sem dados</td></tr>';return;}
-    t.innerHTML=d.rows.map(r=>`<tr><td style="font-family:'Space Mono',monospace;font-size:12px">${r.date}</td><td>${r.count}</td></tr>`).join('');
-  } catch {}
-
-  try {
-    const d = await api('/dashboard/courts/user-added');
-    document.getElementById('b-ucourts').textContent=(d.rows?.length||0)+' novas';
-    const t=document.getElementById('t-ucourts');
-    if(!d.rows?.length){t.innerHTML='<tr><td colspan="2" class="empty">Nenhuma</td></tr>';return;}
-    t.innerHTML=d.rows.map(r=>`<tr><td>${r.court_name}</td><td>${r.added_by_name||'Anônimo'}</td></tr>`).join('');
-  } catch {}
-}
-
-// ── USERS ───────────────────────────────────────────────────
-async function loadUsers() {
-  try {
-    const d = await api('/dashboard/users/recent');
-    document.getElementById('b-newusers').textContent=(d.rows?.length||0)+' recentes';
-    const t=document.getElementById('t-newusers');
-    if(!d.rows?.length){t.innerHTML='<tr><td colspan="5" class="empty">Sem usuários</td></tr>';return;}
-    t.innerHTML=d.rows.map(r=>`<tr>
-      <td>${r.name}</td>
-      <td style="font-size:11px;color:var(--text2)">${r.email}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${new Date(r.created_at).toLocaleDateString('pt-BR')}</td>
-      <td>${r.invited_by?'<span class="pill pill-orange">Convite</span>':'<span class="pill pill-blue">Direto</span>'}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--orange)">${r.invite_code}</td>
-    </tr>`).join('');
-  } catch {}
-
-  try {
-    const d = await api('/dashboard/courts/by-neighborhood');
-    document.getElementById('b-bairro').textContent=(d.rows?.length||0)+' regiões';
-    const t=document.getElementById('t-bairro');
-    if(!d.rows?.length){t.innerHTML='<tr><td colspan="4" class="empty">Sem dados</td></tr>';return;}
-    t.innerHTML=d.rows.map((r,i)=>`<tr><td class="rank">${i+1}</td><td>${r.neighborhood}</td><td><span class="pill pill-green">${r.match_count}</span></td><td>${r.court_count}</td></tr>`).join('');
-  } catch {}
-}
-
-// ── GAMES ───────────────────────────────────────────────────
-async function loadGames() {
-  try {
-    const d = await api('/dashboard/matches/all');
-    document.getElementById('b-allmatches').textContent=(d.rows?.length||0)+' jogos';
-    const t=document.getElementById('t-allmatches');
-    if(!d.rows?.length){t.innerHTML='<tr><td colspan="4" class="empty">Sem jogos</td></tr>';return;}
-    const b={'1x1':'pill-blue','2x2':'pill-purple','3x3':'pill-orange','5x5':'pill-green'};
-    t.innerHTML=d.rows.map(r=>`<tr>
-      <td>${r.court_name}</td>
-      <td><span class="pill ${b[r.modality]||'pill-orange'}">${r.modality}</span></td>
-      <td style="font-family:'Space Mono',monospace;font-size:11px">${new Date(r.scheduled_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
-      <td>${r.player_count}/${r.max_players}</td>
-    </tr>`).join('');
-  } catch {}
-
-  try {
-    const d = await api('/dashboard/users/most-active');
-    const t=document.getElementById('t-activeplayers');
-    if(!d.rows?.length){t.innerHTML='<tr><td colspan="3" class="empty">Sem dados</td></tr>';return;}
-    t.innerHTML=d.rows.map((r,i)=>`<tr><td class="rank">${i+1}</td><td>${r.name}</td><td><span class="pill pill-orange">${r.match_count} jogos</span></td></tr>`).join('');
-  } catch {}
-}
-
-// ── VIRAL ───────────────────────────────────────────────────
-async function loadViral() {
-  try {
-    const d = await api('/dashboard/users/inviters');
-    document.getElementById('b-inviters').textContent=(d.rows?.length||0)+' jogadores';
-    const t=document.getElementById('t-inviters');
-    if(!d.rows?.length){t.innerHTML='<tr><td colspan="4" class="empty">Nenhum convite ainda</td></tr>';return;}
-    t.innerHTML=d.rows.map((r,i)=>`<tr>
-      <td class="rank">${i+1}</td>
-      <td>${r.name}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--orange)">${r.invite_code}</td>
-      <td><span class="pill pill-orange">${r.invited_count}</span></td>
-    </tr>`).join('');
-  } catch {}
-
-  try {
-    const d = await api('/dashboard/users/tree');
-    const el=document.getElementById('t-tree');
-    if(!d.rows?.length){el.innerHTML='<div class="empty">Sem convites ainda</div>';return;}
-    el.innerHTML='';
-    el.className='';
-    d.rows.forEach(r=>{
-      const div=document.createElement('div');
-      div.className='tree-node';
-      div.innerHTML=`<span class="tree-indent">${r.level>0?'└─'.padStart(r.level*3+2,' '):''}</span><span class="tree-name">${r.name}</span><span class="tree-code">${r.invite_code}</span><span class="tree-count">${r.invited_count>0?'▶ '+r.invited_count+' convidados':''}</span>`;
-      el.appendChild(div);
-    });
-  } catch {}
-
-  try {
-    const u = await api('/dashboard/users/count');
-    const total=u.count||0, invite=u.via_invite||0, direct=total-invite;
-    document.getElementById('f-total').textContent=total;
-    document.getElementById('f-invite').textContent=invite;
-    document.getElementById('f-direct').textContent=direct;
-    if(total>0){
-      document.getElementById('f-invite-pct').textContent=Math.round(invite/total*100)+'%';
-      document.getElementById('f-direct-pct').textContent=Math.round(direct/total*100)+'%';
+// ── VIRAL ──────────────────────────────────────────────────
+function loadViral() {
+  apiGet('/dashboard/users/inviters', function(d) {
+    txt('b-inviters', (d.rows&&d.rows.length||0)+' jogadores');
+    html('t-inviters', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td style="font-family:Space Mono,monospace;font-size:12px;color:var(--orange)">'+r.invite_code+'</td><td><span class="pill po">'+r.invited_count+'</span></td></tr>'; }).join('') : '<tr><td colspan="4" class="empty">Nenhum convite ainda</td></tr>');
+  });
+  apiGet('/dashboard/users/tree', function(d) {
+    var treeEl = el('t-tree');
+    if (!d.rows||!d.rows.length) { treeEl.innerHTML='<div class="empty">Sem convites ainda</div>'; return; }
+    treeEl.className='';
+    treeEl.innerHTML = d.rows.map(function(r) {
+      var indent = r.level>0 ? '&nbsp;&nbsp;&nbsp;'.repeat(r.level)+'└─&nbsp;' : '';
+      return '<div class="tree-node"><span style="font-family:Space Mono,monospace;font-size:12px;color:var(--text3)">'+indent+'</span><span style="font-weight:600">'+r.name+'</span><span style="font-family:Space Mono,monospace;font-size:11px;color:var(--orange);margin-left:8px">'+r.invite_code+'</span><span style="margin-left:auto;color:var(--green);font-size:11px">'+(r.invited_count>0?'▶ '+r.invited_count+' convidados':'')+'</span></div>';
+    }).join('');
+  });
+  apiGet('/dashboard/users/count', function(u) {
+    var total=u.count||0, invite=u.via_invite||0, direct=total-invite;
+    txt('f-total', total);
+    txt('f-invite', invite);
+    txt('f-direct', direct);
+    if (total>0) {
+      txt('f-invite-pct', Math.round(invite/total*100)+'%');
+      txt('f-direct-pct', Math.round(direct/total*100)+'%');
     }
-    const ma=await api('/dashboard/users/most-active');
-    document.getElementById('f-active').textContent=ma.rows?.length||0;
-  } catch {}
+  });
+  apiGet('/dashboard/users/most-active', function(d) {
+    txt('f-active', d.rows&&d.rows.length||0);
+  });
 }
 
-// ── BLOG ────────────────────────────────────────────────────
-async function loadBlog() {
-  try {
-    const r = await fetch(API+'/posts');
-    const posts = await r.json();
-    document.getElementById('b-posts').textContent=(posts.length||0)+' posts';
-    const el=document.getElementById('t-posts');
-    if(!posts.length){el.innerHTML='<div class="empty">Nenhum post ainda</div>';return;}
-    el.innerHTML=posts.map(p=>`
-      <div class="blog-item">
-        <div class="blog-item-info">
-          <div class="blog-item-title">${p.title}</div>
-          <div class="blog-item-meta">${new Date(p.created_at).toLocaleDateString('pt-BR')} • ${p.author}</div>
-          <div class="blog-item-preview">${p.content}</div>
-        </div>
-        <div class="blog-item-actions">
-          <button class="btn btn-danger" onclick="deletePost(${p.id})" style="padding:6px 12px;font-size:12px">🗑️</button>
-        </div>
-      </div>`).join('');
-  } catch {}
-}
+// ── HEATMAP ────────────────────────────────────────────────
+var heatMap = null;
 
-async function createPost() {
-  const title=document.getElementById('post-title').value.trim();
-  const content=document.getElementById('post-content').value.trim();
-  const author=document.getElementById('post-author').value.trim();
-  const key=document.getElementById('admin-key').value.trim();
-  const msg=document.getElementById('post-msg');
-  if(!title||!content){msg.style.display='block';msg.style.color='#f87171';msg.textContent='Título e conteúdo são obrigatórios';return;}
-  if(!key){msg.style.display='block';msg.style.color='#f87171';msg.textContent='Informe a chave admin';return;}
-  try {
-    const r=await fetch(API+'/posts',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':key},body:JSON.stringify({title,content,author:author||'Asphalt Hoops'})});
-    const d=await r.json();
-    if(!r.ok) throw new Error(d.error);
-    msg.style.display='block';msg.style.color='var(--green)';msg.textContent='✅ Post publicado!';
-    clearPostForm();loadBlog();
-    setTimeout(()=>msg.style.display='none',3000);
-  } catch(e){msg.style.display='block';msg.style.color='#f87171';msg.textContent='Erro: '+e.message;}
-}
-
-async function deletePost(id) {
-  const key=document.getElementById('admin-key').value.trim();
-  if(!key){alert('Informe a chave admin primeiro');return;}
-  if(!confirm('Deletar este post?')) return;
-  await fetch(API+'/posts/'+id,{method:'DELETE',headers:{'x-admin-key':key}});
-  loadBlog();
-}
-
-function clearPostForm() {
-  document.getElementById('post-title').value='';
-  document.getElementById('post-content').value='';
-  document.getElementById('post-author').value='Asphalt Hoops';
-}
-
-
-// ── HEATMAP ─────────────────────────────────────────────────
-let heatmapMap = null;
-
-async function loadHeatmap() {
-  if (!heatmapMap) {
-    setTimeout(() => {
-      heatmapMap = L.map('heatmap').setView([-30.0353, -51.2177], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap', maxZoom: 19
-      }).addTo(heatmapMap);
+function loadHeatmap() {
+  if (!heatMap) {
+    setTimeout(function() {
+      heatMap = L.map('heatmap-div').setView([-30.0353,-51.2177], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap',maxZoom:19}).addTo(heatMap);
       fetchHeatData();
-    }, 100);
+    }, 150);
   } else {
     fetchHeatData();
   }
 }
 
-async function fetchHeatData() {
-  try {
-    const d = await api('/dashboard/courts/heatmap');
-    if (!d.rows?.length) return;
+function fetchHeatData() {
+  apiGet('/dashboard/courts/heatmap', function(d) {
+    if (!d.rows||!d.rows.length) return;
+    var maxCount = 1;
+    d.rows.forEach(function(r){ if(+r.match_count>maxCount) maxCount=+r.match_count; });
 
-    // Heatmap points [lat, lng, intensity]
-    const max = Math.max(...d.rows.map(r => +r.match_count), 1);
-    const points = d.rows.map(r => [+r.lat, +r.lng, (+r.match_count / max)]);
-
-    // Círculos de calor por intensidade
-    const max2 = Math.max(...d.rows.map(r => +r.match_count), 1);
-    d.rows.forEach(r => {
-      const count = +r.match_count;
-      const pct = count / max2;
-      const color = pct >= 0.7 ? '#EF4444' : pct >= 0.4 ? '#F97316' : pct >= 0.1 ? '#F59E0B' : '#3B82F6';
-      const radius = count === 0 ? 8 : Math.max(10, Math.min(35, count * 4 + 8));
-      L.circleMarker([+r.lat, +r.lng], {
-        radius, fillColor: color, fillOpacity: count === 0 ? 0.2 : 0.7,
-        color: '#fff', weight: count === 0 ? 1 : 2
-      }).addTo(heatmapMap).bindPopup(`<b>🏀 ${r.name}</b><br><span style="color:${color};font-weight:700">${count} jogo${count!==1?'s':''} marcado${count!==1?'s':''}</span><br><small>${(r.address||'').split('—')[1]?.trim()||''}</small>`);
+    d.rows.forEach(function(r) {
+      var count = +r.match_count;
+      var pct = count/maxCount;
+      var color = pct>=0.7?'#EF4444':pct>=0.4?'#F97316':pct>=0.1?'#F59E0B':'#3B82F6';
+      var radius = count===0?7:Math.max(10,Math.min(30,count*4+8));
+      var opacity = count===0?0.25:0.75;
+      L.circleMarker([+r.lat,+r.lng],{radius:radius,fillColor:color,fillOpacity:opacity,color:'#fff',weight:count===0?1:2})
+        .addTo(heatMap)
+        .bindPopup('<b>🏀 '+r.name+'</b><br><span style="color:'+color+';font-weight:700">'+count+' jogo'+(count!==1?'s':'')+'</span>');
     });
 
-    // Ranking
-    document.getElementById('b-heatranking').textContent = d.rows.length + ' quadras';
-    const t = document.getElementById('t-heatranking');
-    const bars = {'high':'pill-red','mid':'pill-orange','low':'pill-blue'};
-    t.innerHTML = d.rows.map((r, i) => {
-      const count = +r.match_count;
-      const level = count >= 5 ? 'high' : count >= 2 ? 'mid' : 'low';
-      const label = count >= 5 ? '🔥 Alta' : count >= 2 ? '⚡ Média' : '❄️ Baixa';
-      const bairro = (r.address||'').split('—')[1]?.trim() || '—';
-      return `<tr>
-        <td class="rank">${i+1}</td>
-        <td>${r.name}</td>
-        <td style="font-size:12px;color:var(--text2)">${bairro}</td>
-        <td><span class="pill pill-green">${count}</span></td>
-        <td><span class="pill ${bars[level]}">${label}</span></td>
-      </tr>`;
+    txt('b-heatrank', d.rows.length+' quadras');
+    html('t-heatrank', d.rows.map(function(r,i) {
+      var count=+r.match_count;
+      var lvl=count>=5?'pr po':count>=2?'po':count>=1?'pb':'';
+      var lbl=count>=5?'🔥 Alta':count>=2?'⚡ Média':count>=1?'💧 Baixa':'❄️ Nenhum';
+      var bairro=(r.address||'').split('—')[1];
+      return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td style="font-size:12px;color:var(--text2)">'+(bairro?bairro.trim():'—')+'</td><td><span class="pill pg">'+count+'</span></td><td><span class="pill '+lvl+'">'+lbl+'</span></td></tr>';
+    }).join(''));
+  });
+}
+
+// ── BLOG ───────────────────────────────────────────────────
+function loadBlog() {
+  fetch(API+'/posts').then(function(r){return r.json();}).then(function(posts) {
+    txt('b-posts', posts.length+' posts');
+    var container = el('t-posts');
+    if (!posts.length) { container.innerHTML='<div class="empty">Nenhum post ainda</div>'; return; }
+    container.innerHTML = posts.map(function(p) {
+      return '<div class="blog-item"><div style="flex:1"><div style="font-size:14px;font-weight:700;margin-bottom:4px">'+p.title+'</div><div style="font-size:11px;color:var(--text2);font-family:Space Mono,monospace">'+new Date(p.created_at).toLocaleDateString('pt-BR')+' • '+p.author+'</div><div style="font-size:12px;color:var(--text3);margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+p.content+'</div></div><button class="btn btn-danger" data-id="'+p.id+'" style="padding:4px 10px;font-size:11px;flex-shrink:0">🗑️</button></div>';
     }).join('');
-  } catch(e) { console.error(e); }
-}
-
-// ── MANAGE ──────────────────────────────────────────────────
-async function loadManage() {
-  try {
-    const d = await api('/dashboard/users/all');
-    document.getElementById('b-manage').textContent = (d.rows?.length||0) + ' usuários';
-    const t = document.getElementById('t-manage');
-    if (!d.rows?.length) { t.innerHTML = '<tr><td colspan="6" class="empty">Sem usuários</td></tr>'; return; }
-    t.innerHTML = d.rows.map(r => `<tr>
-      <td>${r.name}</td>
-      <td style="font-size:11px;color:var(--text2)">${r.email}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${new Date(r.created_at).toLocaleDateString('pt-BR')}</td>
-      <td>${r.invited_by ? '<span class="pill pill-orange">Convite</span>' : '<span class="pill pill-blue">Direto</span>'}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--orange)">${r.invite_code}</td>
-      <td><button class="btn btn-danger" onclick="deleteUser(${r.id},'${r.email}')" style="padding:4px 10px;font-size:11px">🗑️ Deletar</button></td>
-    </tr>`).join('');
-  } catch(e) { console.error(e); }
-}
-
-async function deleteUser(id, email) {
-  const key = document.getElementById('manage-key').value.trim();
-  if (!key) { alert('Informe a chave admin'); return; }
-  if (!confirm('Deletar usuário ' + email + '?\n\nIsso também remove seus jogos e mensagens.')) return;
-  try {
-    const r = await fetch(API + '/dashboard/users/' + id, {
-      method: 'DELETE',
-      headers: { 'x-admin-key': key }
+    container.querySelectorAll('[data-id]').forEach(function(btn) {
+      btn.addEventListener('click', function() { deletePost(this.getAttribute('data-id')); });
     });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    loadManage();
-  } catch(e) { alert('Erro: ' + e.message); }
+  });
 }
 
+function deletePost(id) {
+  var key = el('admin-key').value.trim();
+  if (!key) { alert('Informe a chave admin'); return; }
+  if (!confirm('Deletar este post?')) return;
+  fetch(API+'/posts/'+id,{method:'DELETE',headers:{'x-admin-key':key}}).then(function(){loadBlog();});
+}
+
+el('publish-btn').addEventListener('click', function() {
+  var title = el('post-title').value.trim();
+  var content = el('post-content').value.trim();
+  var author = el('post-author').value.trim();
+  var key = el('admin-key').value.trim();
+  var msg = el('post-msg');
+  if (!title||!content) { msg.style.display='block';msg.style.color='#f87171';msg.textContent='Título e conteúdo obrigatórios'; return; }
+  if (!key) { msg.style.display='block';msg.style.color='#f87171';msg.textContent='Informe a chave admin'; return; }
+  fetch(API+'/posts',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':key},body:JSON.stringify({title:title,content:content,author:author||'Asphalt Hoops'})})
+    .then(function(r){return r.json();})
+    .then(function(d) {
+      if (d.error) { msg.style.display='block';msg.style.color='#f87171';msg.textContent='Erro: '+d.error; return; }
+      msg.style.display='block';msg.style.color='var(--green)';msg.textContent='✅ Post publicado!';
+      el('post-title').value=''; el('post-content').value='';
+      loadBlog();
+      setTimeout(function(){msg.style.display='none';},3000);
+    });
+});
+
+// ── MANAGE ─────────────────────────────────────────────────
+function loadManage() {
+  apiGet('/dashboard/users/all', function(d) {
+    txt('b-manage', (d.rows&&d.rows.length||0)+' usuários');
+    var tbody = el('t-manage');
+    if (!d.rows||!d.rows.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">Sem usuários</td></tr>'; return; }
+    tbody.innerHTML = d.rows.map(function(r) {
+      return '<tr><td>'+r.name+'</td><td style="font-size:11px;color:var(--text2)">'+r.email+'</td><td style="font-family:Space Mono,monospace;font-size:11px;color:var(--text2)">'+new Date(r.created_at).toLocaleDateString('pt-BR')+'</td><td>'+(r.invited_by?'<span class="pill po">Convite</span>':'<span class="pill pb">Direto</span>')+'</td><td style="font-family:Space Mono,monospace;font-size:12px;color:var(--orange)">'+r.invite_code+'</td><td><button class="btn btn-danger" data-id="'+r.id+'" data-email="'+r.email+'" style="padding:4px 10px;font-size:11px">🗑️</button></td></tr>';
+    }).join('');
+    tbody.querySelectorAll('[data-id]').forEach(function(btn) {
+      btn.addEventListener('click', function() { deleteUser(this.getAttribute('data-id'), this.getAttribute('data-email')); });
+    });
+  });
+}
+
+function deleteUser(id, email) {
+  var key = el('manage-key').value.trim();
+  if (!key) { alert('Informe a chave admin'); return; }
+  if (!confirm('Deletar usuário '+email+'?\n\nIsso remove seus jogos e mensagens.')) return;
+  fetch(API+'/dashboard/users/'+id,{method:'DELETE',headers:{'x-admin-key':key}})
+    .then(function(r){return r.json();})
+    .then(function(d) {
+      if (d.error) { alert('Erro: '+d.error); return; }
+      loadManage();
+    });
+}
+
+// Init
 loadOverview();
 </script>
 </body>
