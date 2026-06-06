@@ -68,10 +68,12 @@ export default function CourtDetailScreen({ route, navigation }: any) {
         }),
       });
       setShowModal(false);
-      loadMatches();
       navigation.navigate('Chat', { match, courtName: court.name });
+      loadMatches();
     } catch (e: any) {
-      Alert.alert('Erro', e.message);
+      if (e.message !== 'Network request failed') {
+        Alert.alert('Erro', e.message);
+      }
     } finally {
       setCreating(false);
     }
