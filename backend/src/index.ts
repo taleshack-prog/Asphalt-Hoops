@@ -11,6 +11,7 @@ import courtsRoutes from './routes/courts';
 import matchesRoutes from './routes/matches';
 import chatRoutes from './routes/chat';
 import dashboardRoutes from './routes/dashboard';
+import postsRoutes from './routes/posts';
 
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +29,7 @@ app.use('/api/courts', courtsRoutes);
 app.use('/api/matches', matchesRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/posts', postsRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
