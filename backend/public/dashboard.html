@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Asphalt Hoops — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <style>
 :root{--orange:#F97316;--bg:#0A0A0A;--bg2:#111;--bg3:#1A1A1A;--bg4:#222;--border:#2A2A2A;--text:#F0F0F0;--text2:#888;--text3:#444;--green:#22C55E;--blue:#3B82F6;--purple:#A855F7;--red:#EF4444;}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -107,6 +110,8 @@ textarea.inp{min-height:140px;resize:vertical;}
     <button class="tab" onclick="showTab('games')">📅 Jogos</button>
     <button class="tab" onclick="showTab('viral')">🎟️ Viralização</button>
     <button class="tab" onclick="showTab('blog')">📰 Blog</button>
+    <button class="tab" onclick="showTab('heatmap')">🔥 Mapa de Calor</button>
+    <button class="tab" onclick="showTab('manage')">⚙️ Gestão</button>
   </div>
 
   <!-- VISÃO GERAL -->
@@ -235,6 +240,38 @@ textarea.inp{min-height:140px;resize:vertical;}
       </div>
     </div>
   </div>
+
+  <!-- MAPA DE CALOR -->
+  <div id="tab-heatmap" class="section">
+    <div class="section-label">Intensidade de uso por praça</div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header"><div class="card-title">🔥 Mapa de Calor — Jogos por Quadra</div><div class="badge">Porto Alegre</div></div>
+      <div id="heatmap" style="height:500px;border-radius:0 0 14px 14px"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📊 Ranking de Praças</div><div class="badge" id="b-heatranking">—</div></div>
+      <table><thead><tr><th>#</th><th>Praça / Quadra</th><th>Bairro</th><th>Jogos</th><th>Intensidade</th></tr></thead>
+      <tbody id="t-heatranking"><tr><td colspan="5" class="loading">...</td></tr></tbody></table>
+    </div>
+  </div>
+
+  <!-- GESTÃO -->
+  <div id="tab-manage" class="section">
+    <div class="section-label">Gestão de Usuários</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">👥 Usuários Cadastrados</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="manage-key" class="inp" type="password" placeholder="Chave admin..." style="width:180px;padding:6px 10px;font-size:12px"/>
+          <div class="badge" id="b-manage">—</div>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Nome</th><th>Email</th><th>Cadastro</th><th>Via</th><th>Código</th><th>Ação</th></tr></thead>
+        <tbody id="t-manage"><tr><td colspan="6" class="loading">...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -264,14 +301,206 @@ function showTab(name) {
 }
 
 function loadTab(name) {
-  if (name==='overview') loadOverview();
+  if (name==='overview') 
+// ── HEATMAP ─────────────────────────────────────────────────
+let heatmapMap = null;
+let heatLayer = null;
+
+async function loadHeatmap() {
+  if (!heatmapMap) {
+    setTimeout(() => {
+      heatmapMap = L.map('heatmap').setView([-30.0353, -51.2177], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap', maxZoom: 19
+      }).addTo(heatmapMap);
+      fetchHeatData();
+    }, 100);
+  } else {
+    fetchHeatData();
+  }
+}
+
+async function fetchHeatData() {
+  try {
+    const d = await api('/dashboard/courts/heatmap');
+    if (!d.rows?.length) return;
+
+    // Heatmap points [lat, lng, intensity]
+    const max = Math.max(...d.rows.map(r => +r.match_count), 1);
+    const points = d.rows.map(r => [+r.lat, +r.lng, (+r.match_count / max)]);
+
+    if (heatLayer) heatmapMap.removeLayer(heatLayer);
+    heatLayer = L.heatLayer(points, {
+      radius: 40, blur: 25, maxZoom: 17,
+      gradient: { 0.2: '#3B82F6', 0.5: '#F59E0B', 0.8: '#F97316', 1.0: '#EF4444' }
+    }).addTo(heatmapMap);
+
+    // Markers com contagem
+    d.rows.filter(r => +r.match_count > 0).forEach(r => {
+      L.circleMarker([+r.lat, +r.lng], {
+        radius: Math.max(6, Math.min(20, +r.match_count * 3)),
+        fillColor: '#F97316', fillOpacity: 0.8, color: '#fff', weight: 2
+      }).addTo(heatmapMap).bindPopup(`<b>${r.name}</b><br>${r.match_count} jogos`);
+    });
+
+    // Ranking
+    document.getElementById('b-heatranking').textContent = d.rows.length + ' quadras';
+    const t = document.getElementById('t-heatranking');
+    const bars = {'high':'pill-red','mid':'pill-orange','low':'pill-blue'};
+    t.innerHTML = d.rows.map((r, i) => {
+      const count = +r.match_count;
+      const level = count >= 5 ? 'high' : count >= 2 ? 'mid' : 'low';
+      const label = count >= 5 ? '🔥 Alta' : count >= 2 ? '⚡ Média' : '❄️ Baixa';
+      const bairro = (r.address||'').split('—')[1]?.trim() || '—';
+      return `<tr>
+        <td class="rank">${i+1}</td>
+        <td>${r.name}</td>
+        <td style="font-size:12px;color:var(--text2)">${bairro}</td>
+        <td><span class="pill pill-green">${count}</span></td>
+        <td><span class="pill ${bars[level]}">${label}</span></td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+// ── MANAGE ──────────────────────────────────────────────────
+async function loadManage() {
+  try {
+    const d = await api('/dashboard/users/all');
+    document.getElementById('b-manage').textContent = (d.rows?.length||0) + ' usuários';
+    const t = document.getElementById('t-manage');
+    if (!d.rows?.length) { t.innerHTML = '<tr><td colspan="6" class="empty">Sem usuários</td></tr>'; return; }
+    t.innerHTML = d.rows.map(r => `<tr>
+      <td>${r.name}</td>
+      <td style="font-size:11px;color:var(--text2)">${r.email}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${new Date(r.created_at).toLocaleDateString('pt-BR')}</td>
+      <td>${r.invited_by ? '<span class="pill pill-orange">Convite</span>' : '<span class="pill pill-blue">Direto</span>'}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--orange)">${r.invite_code}</td>
+      <td><button class="btn btn-danger" onclick="deleteUser(${r.id},'${r.email}')" style="padding:4px 10px;font-size:11px">🗑️ Deletar</button></td>
+    </tr>`).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function deleteUser(id, email) {
+  const key = document.getElementById('manage-key').value.trim();
+  if (!key) { alert('Informe a chave admin'); return; }
+  if (!confirm('Deletar usuário ' + email + '?\n\nIsso também remove seus jogos e mensagens.')) return;
+  try {
+    const r = await fetch(API + '/dashboard/users/' + id, {
+      method: 'DELETE',
+      headers: { 'x-admin-key': key }
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    loadManage();
+  } catch(e) { alert('Erro: ' + e.message); }
+}
+
+loadOverview();
   else if (name==='users') loadUsers();
   else if (name==='games') loadGames();
   else if (name==='viral') loadViral();
   else if (name==='blog') loadBlog();
+  else if (name==='heatmap') loadHeatmap();
+  else if (name==='manage') loadManage();
 }
 
-async function loadAll() { loadOverview(); }
+async function loadAll() { 
+// ── HEATMAP ─────────────────────────────────────────────────
+let heatmapMap = null;
+let heatLayer = null;
+
+async function loadHeatmap() {
+  if (!heatmapMap) {
+    setTimeout(() => {
+      heatmapMap = L.map('heatmap').setView([-30.0353, -51.2177], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap', maxZoom: 19
+      }).addTo(heatmapMap);
+      fetchHeatData();
+    }, 100);
+  } else {
+    fetchHeatData();
+  }
+}
+
+async function fetchHeatData() {
+  try {
+    const d = await api('/dashboard/courts/heatmap');
+    if (!d.rows?.length) return;
+
+    // Heatmap points [lat, lng, intensity]
+    const max = Math.max(...d.rows.map(r => +r.match_count), 1);
+    const points = d.rows.map(r => [+r.lat, +r.lng, (+r.match_count / max)]);
+
+    if (heatLayer) heatmapMap.removeLayer(heatLayer);
+    heatLayer = L.heatLayer(points, {
+      radius: 40, blur: 25, maxZoom: 17,
+      gradient: { 0.2: '#3B82F6', 0.5: '#F59E0B', 0.8: '#F97316', 1.0: '#EF4444' }
+    }).addTo(heatmapMap);
+
+    // Markers com contagem
+    d.rows.filter(r => +r.match_count > 0).forEach(r => {
+      L.circleMarker([+r.lat, +r.lng], {
+        radius: Math.max(6, Math.min(20, +r.match_count * 3)),
+        fillColor: '#F97316', fillOpacity: 0.8, color: '#fff', weight: 2
+      }).addTo(heatmapMap).bindPopup(`<b>${r.name}</b><br>${r.match_count} jogos`);
+    });
+
+    // Ranking
+    document.getElementById('b-heatranking').textContent = d.rows.length + ' quadras';
+    const t = document.getElementById('t-heatranking');
+    const bars = {'high':'pill-red','mid':'pill-orange','low':'pill-blue'};
+    t.innerHTML = d.rows.map((r, i) => {
+      const count = +r.match_count;
+      const level = count >= 5 ? 'high' : count >= 2 ? 'mid' : 'low';
+      const label = count >= 5 ? '🔥 Alta' : count >= 2 ? '⚡ Média' : '❄️ Baixa';
+      const bairro = (r.address||'').split('—')[1]?.trim() || '—';
+      return `<tr>
+        <td class="rank">${i+1}</td>
+        <td>${r.name}</td>
+        <td style="font-size:12px;color:var(--text2)">${bairro}</td>
+        <td><span class="pill pill-green">${count}</span></td>
+        <td><span class="pill ${bars[level]}">${label}</span></td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+// ── MANAGE ──────────────────────────────────────────────────
+async function loadManage() {
+  try {
+    const d = await api('/dashboard/users/all');
+    document.getElementById('b-manage').textContent = (d.rows?.length||0) + ' usuários';
+    const t = document.getElementById('t-manage');
+    if (!d.rows?.length) { t.innerHTML = '<tr><td colspan="6" class="empty">Sem usuários</td></tr>'; return; }
+    t.innerHTML = d.rows.map(r => `<tr>
+      <td>${r.name}</td>
+      <td style="font-size:11px;color:var(--text2)">${r.email}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${new Date(r.created_at).toLocaleDateString('pt-BR')}</td>
+      <td>${r.invited_by ? '<span class="pill pill-orange">Convite</span>' : '<span class="pill pill-blue">Direto</span>'}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--orange)">${r.invite_code}</td>
+      <td><button class="btn btn-danger" onclick="deleteUser(${r.id},'${r.email}')" style="padding:4px 10px;font-size:11px">🗑️ Deletar</button></td>
+    </tr>`).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function deleteUser(id, email) {
+  const key = document.getElementById('manage-key').value.trim();
+  if (!key) { alert('Informe a chave admin'); return; }
+  if (!confirm('Deletar usuário ' + email + '?\n\nIsso também remove seus jogos e mensagens.')) return;
+  try {
+    const r = await fetch(API + '/dashboard/users/' + id, {
+      method: 'DELETE',
+      headers: { 'x-admin-key': key }
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    loadManage();
+  } catch(e) { alert('Erro: ' + e.message); }
+}
+
+loadOverview(); }
 
 // ── OVERVIEW ────────────────────────────────────────────────
 async function loadOverview() {
@@ -473,6 +702,101 @@ function clearPostForm() {
   document.getElementById('post-title').value='';
   document.getElementById('post-content').value='';
   document.getElementById('post-author').value='Asphalt Hoops';
+}
+
+
+// ── HEATMAP ─────────────────────────────────────────────────
+let heatmapMap = null;
+let heatLayer = null;
+
+async function loadHeatmap() {
+  if (!heatmapMap) {
+    setTimeout(() => {
+      heatmapMap = L.map('heatmap').setView([-30.0353, -51.2177], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap', maxZoom: 19
+      }).addTo(heatmapMap);
+      fetchHeatData();
+    }, 100);
+  } else {
+    fetchHeatData();
+  }
+}
+
+async function fetchHeatData() {
+  try {
+    const d = await api('/dashboard/courts/heatmap');
+    if (!d.rows?.length) return;
+
+    // Heatmap points [lat, lng, intensity]
+    const max = Math.max(...d.rows.map(r => +r.match_count), 1);
+    const points = d.rows.map(r => [+r.lat, +r.lng, (+r.match_count / max)]);
+
+    if (heatLayer) heatmapMap.removeLayer(heatLayer);
+    heatLayer = L.heatLayer(points, {
+      radius: 40, blur: 25, maxZoom: 17,
+      gradient: { 0.2: '#3B82F6', 0.5: '#F59E0B', 0.8: '#F97316', 1.0: '#EF4444' }
+    }).addTo(heatmapMap);
+
+    // Markers com contagem
+    d.rows.filter(r => +r.match_count > 0).forEach(r => {
+      L.circleMarker([+r.lat, +r.lng], {
+        radius: Math.max(6, Math.min(20, +r.match_count * 3)),
+        fillColor: '#F97316', fillOpacity: 0.8, color: '#fff', weight: 2
+      }).addTo(heatmapMap).bindPopup(`<b>${r.name}</b><br>${r.match_count} jogos`);
+    });
+
+    // Ranking
+    document.getElementById('b-heatranking').textContent = d.rows.length + ' quadras';
+    const t = document.getElementById('t-heatranking');
+    const bars = {'high':'pill-red','mid':'pill-orange','low':'pill-blue'};
+    t.innerHTML = d.rows.map((r, i) => {
+      const count = +r.match_count;
+      const level = count >= 5 ? 'high' : count >= 2 ? 'mid' : 'low';
+      const label = count >= 5 ? '🔥 Alta' : count >= 2 ? '⚡ Média' : '❄️ Baixa';
+      const bairro = (r.address||'').split('—')[1]?.trim() || '—';
+      return `<tr>
+        <td class="rank">${i+1}</td>
+        <td>${r.name}</td>
+        <td style="font-size:12px;color:var(--text2)">${bairro}</td>
+        <td><span class="pill pill-green">${count}</span></td>
+        <td><span class="pill ${bars[level]}">${label}</span></td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+// ── MANAGE ──────────────────────────────────────────────────
+async function loadManage() {
+  try {
+    const d = await api('/dashboard/users/all');
+    document.getElementById('b-manage').textContent = (d.rows?.length||0) + ' usuários';
+    const t = document.getElementById('t-manage');
+    if (!d.rows?.length) { t.innerHTML = '<tr><td colspan="6" class="empty">Sem usuários</td></tr>'; return; }
+    t.innerHTML = d.rows.map(r => `<tr>
+      <td>${r.name}</td>
+      <td style="font-size:11px;color:var(--text2)">${r.email}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${new Date(r.created_at).toLocaleDateString('pt-BR')}</td>
+      <td>${r.invited_by ? '<span class="pill pill-orange">Convite</span>' : '<span class="pill pill-blue">Direto</span>'}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--orange)">${r.invite_code}</td>
+      <td><button class="btn btn-danger" onclick="deleteUser(${r.id},'${r.email}')" style="padding:4px 10px;font-size:11px">🗑️ Deletar</button></td>
+    </tr>`).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function deleteUser(id, email) {
+  const key = document.getElementById('manage-key').value.trim();
+  if (!key) { alert('Informe a chave admin'); return; }
+  if (!confirm('Deletar usuário ' + email + '?\n\nIsso também remove seus jogos e mensagens.')) return;
+  try {
+    const r = await fetch(API + '/dashboard/users/' + id, {
+      method: 'DELETE',
+      headers: { 'x-admin-key': key }
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    loadManage();
+  } catch(e) { alert('Erro: ' + e.message); }
 }
 
 loadOverview();
