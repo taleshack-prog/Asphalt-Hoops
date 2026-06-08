@@ -32,7 +32,7 @@ router.post('/chat', async (req: Request, res: Response): Promise<void> => {
         messages,
       }),
     });
-    const data = await response.json();
+    const data = await response.json() as any;
     res.json({ reply: data.content?.[0]?.text || 'Eita, não consegui responder agora!' });
   } catch (err) {
     console.error(err);
