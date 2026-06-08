@@ -12,6 +12,7 @@ import matchesRoutes from './routes/matches';
 import chatRoutes from './routes/chat';
 import dashboardRoutes from './routes/dashboard';
 import postsRoutes from './routes/posts';
+import messagesRoutes from './routes/messages';
 
 const app = express();
 const server = http.createServer(app);
@@ -20,7 +21,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Dashboard admin — URL secreta
 app.get('/asphalt-dashboard', (_req, res) => {
   res.sendFile(path.join(__dirname, '../public/dashboard.html'));
 });
@@ -31,6 +31,7 @@ app.use('/api/matches', matchesRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/posts', postsRoutes);
+app.use('/api/messages', messagesRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
@@ -43,8 +44,9 @@ io.on('connection', (socket) => {
     if (!data.matchId || !data.userId || !data.message?.trim()) return;
     try {
       const result = await pool.query(`INSERT INTO chat_messages (match_id, user_id, message) VALUES ($1, $2, $3) RETURNING id, message, created_at`, [data.matchId, data.userId, data.message.trim()]);
-      const user = await pool.query('SELECT name FROM users WHERE id = $1', [data.userId]);
-      io.to(`match_${data.matchId}`).emit('new_message', { ...result.rows[0], name: user.rows[0]?.name, user_id: data.userId });
+      const user = await pool.query('SELECT name, nickname FROM users WHERE id = $1', [data.userId]);
+      const name = user.rows[0]?.nickname || user.rows[0]?.name;
+      io.to(`match_${data.matchId}`).emit('new_message', { ...result.rows[0], name, user_id: data.userId });
     } catch {}
   });
 
@@ -53,8 +55,9 @@ io.on('connection', (socket) => {
     if (!data.userId || !data.message?.trim()) return;
     try {
       const result = await pool.query(`INSERT INTO chat_messages (user_id, message, is_general) VALUES ($1, $2, TRUE) RETURNING id, message, created_at`, [data.userId, data.message.trim()]);
-      const user = await pool.query('SELECT name FROM users WHERE id = $1', [data.userId]);
-      io.to('general').emit('new_general_message', { ...result.rows[0], name: user.rows[0]?.name, user_id: data.userId });
+      const user = await pool.query('SELECT name, nickname FROM users WHERE id = $1', [data.userId]);
+      const name = user.rows[0]?.nickname || user.rows[0]?.name;
+      io.to('general').emit('new_general_message', { ...result.rows[0], name, user_id: data.userId });
     } catch {}
   });
 
@@ -64,8 +67,22 @@ io.on('connection', (socket) => {
     if (!data.groupId || !data.userId || !data.message?.trim()) return;
     try {
       const result = await pool.query(`INSERT INTO chat_messages (group_id, user_id, message) VALUES ($1, $2, $3) RETURNING id, message, created_at`, [data.groupId, data.userId, data.message.trim()]);
-      const user = await pool.query('SELECT name FROM users WHERE id = $1', [data.userId]);
-      io.to(`group_${data.groupId}`).emit('new_group_message', { ...result.rows[0], name: user.rows[0]?.name, user_id: data.userId });
+      const user = await pool.query('SELECT name, nickname FROM users WHERE id = $1', [data.userId]);
+      const name = user.rows[0]?.nickname || user.rows[0]?.name;
+      io.to(`group_${data.groupId}`).emit('new_group_message', { ...result.rows[0], name, user_id: data.userId });
+    } catch {}
+  });
+
+  // Chat privado 1x1
+  socket.on('join_private', (room: string) => { socket.join(`private_${room}`); });
+  socket.on('send_private_message', async (data: { fromUser: number; toUser: number; message: string }) => {
+    if (!data.fromUser || !data.toUser || !data.message?.trim()) return;
+    try {
+      const result = await pool.query(`INSERT INTO private_messages (from_user, to_user, message) VALUES ($1, $2, $3) RETURNING id, message, created_at`, [data.fromUser, data.toUser, data.message.trim()]);
+      const user = await pool.query('SELECT name, nickname FROM users WHERE id = $1', [data.fromUser]);
+      const name = user.rows[0]?.nickname || user.rows[0]?.name;
+      const room = [data.fromUser, data.toUser].sort().join('_');
+      io.to(`private_${room}`).emit('new_private_message', { ...result.rows[0], name, user_id: data.fromUser });
     } catch {}
   });
 
