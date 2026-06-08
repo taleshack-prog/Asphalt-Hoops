@@ -13,6 +13,7 @@ import chatRoutes from './routes/chat';
 import dashboardRoutes from './routes/dashboard';
 import postsRoutes from './routes/posts';
 import messagesRoutes from './routes/messages';
+import oscarRoutes from './routes/oscar';
 
 const app = express();
 const server = http.createServer(app);
@@ -32,6 +33,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/messages', messagesRoutes);
+app.use('/api/oscar', oscarRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
