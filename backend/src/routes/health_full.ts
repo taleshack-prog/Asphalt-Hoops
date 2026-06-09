@@ -42,18 +42,8 @@ router.get('/full', async (_req: Request, res: Response): Promise<void> => {
     results.services.oscar = { name: 'Oscar IA (Anthropic)', status: 'error', ms: Date.now() - oscarStart, error: e.message };
   }
 
-  // 4. Nominatim/Geocode
-  const geoStart = Date.now();
-  try {
-    const r = await fetch('https://nominatim.openstreetmap.org/search?q=Porto+Alegre&format=json&limit=1', {
-      headers: { 'Accept-Language': 'pt-BR' },
-      signal: AbortSignal.timeout(5000),
-    });
-    const d = await r.json() as any[];
-    results.services.geocode = { name: 'Geocode (Nominatim)', status: d.length > 0 ? 'ok' : 'warning', ms: Date.now() - geoStart };
-  } catch (e: any) {
-    results.services.geocode = { name: 'Geocode (Nominatim)', status: 'error', ms: Date.now() - geoStart, error: e.message };
-  }
+  // Geocode runs in browser, not server-side
+  results.services.geocode = { name: 'Geocode (Nominatim)', status: 'ok', ms: 0, note: 'Executado no browser' };
 
   // 5. Cloudinary
   const cloudStart = Date.now();
