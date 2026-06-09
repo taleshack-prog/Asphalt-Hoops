@@ -14,6 +14,7 @@ import dashboardRoutes from './routes/dashboard';
 import postsRoutes from './routes/posts';
 import messagesRoutes from './routes/messages';
 import oscarRoutes from './routes/oscar';
+import geocodeRoutes from './routes/geocode';
 
 const app = express();
 const server = http.createServer(app);
@@ -34,6 +35,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/oscar', oscarRoutes);
+app.use('/api/geocode', geocodeRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
