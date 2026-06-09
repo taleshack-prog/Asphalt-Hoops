@@ -220,11 +220,7 @@ var heatmapInited = false;
 
 // ── Helpers ────────────────────────────────────────────────
 function getToken(cb) {
-  if (TOKEN) { cb(TOKEN); return; }
-  fetch(API+'/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'talhack@yahoo.com',password:'admin123'})})
-    .then(function(r){return r.json();})
-    .then(function(d){TOKEN=d.token||'';cb(TOKEN);})
-    .catch(function(){cb('');});
+  cb('ADMIN_KEY:AH@admin2024!');
 }
 
 function apiGet(path, cb) {
