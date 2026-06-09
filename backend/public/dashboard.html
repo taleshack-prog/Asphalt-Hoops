@@ -266,7 +266,16 @@ function showTab(name) {
 }
 
 function loadTab(name) {
-  if (name==='overview') 
+  if (name==='overview') loadOverview();
+  else if (name==='users') loadUsers();
+  else if (name==='games') loadGames();
+  else if (name==='viral') loadViral();
+  else if (name==='heatmap') loadHeatmap();
+  else if (name==='blog') loadBlog();
+  else if (name==='manage') loadManage();
+  else if (name==='health') loadHealth();
+}
+
 // HEALTH
 var healthAlerts = [];
 var healthTimer = null;
