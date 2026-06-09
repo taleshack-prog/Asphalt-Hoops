@@ -94,6 +94,7 @@ textarea.inp{min-height:120px;resize:vertical;}
     <button class="tab" id="tab-btn-heatmap">🔥 Mapa de Calor</button>
     <button class="tab" id="tab-btn-blog">📰 Blog</button>
     <button class="tab" id="tab-btn-manage">⚙️ Gestão</button>
+    <button class="tab" id="tab-btn-health">🟢 Sistema</button>
   </div>
 
   <!-- OVERVIEW -->
@@ -175,6 +176,35 @@ textarea.inp{min-height:120px;resize:vertical;}
     </div>
   </div>
 
+
+  <!-- SISTEMA / HEALTH -->
+  <div id="sec-health" class="section">
+    <div class="slabel">Status dos Serviços em Tempo Real</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div id="overall-status" style="font-size:18px;font-weight:700;font-family:'Josefin Sans',sans-serif">Verificando...</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="last-check" style="font-size:11px;color:var(--text3);font-family:'Space Mono',monospace"></div>
+        <button class="btn" onclick="loadHealth()">↻ Verificar</button>
+      </div>
+    </div>
+
+    <div id="services-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:28px">
+      <div class="loading">Carregando...</div>
+    </div>
+
+    <div class="slabel">Estatísticas Rápidas</div>
+    <div class="kpi-grid" id="health-stats">
+      <div class="kpi" style="--accent:#F97316"><div class="kpi-icon">👥</div><div class="kpi-val" id="hs-users">—</div><div class="kpi-label">USUÁRIOS</div></div>
+      <div class="kpi" style="--accent:#22C55E"><div class="kpi-icon">📅</div><div class="kpi-val" id="hs-matches">—</div><div class="kpi-label">PARTIDAS</div></div>
+      <div class="kpi" style="--accent:#A855F7"><div class="kpi-icon">💬</div><div class="kpi-val" id="hs-msgs">—</div><div class="kpi-label">MENSAGENS</div></div>
+    </div>
+
+    <div class="slabel">Log de Alertas</div>
+    <div id="alerts-log" class="card" style="padding:16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text2);min-height:80px">
+      Nenhum alerta registrado
+    </div>
+  </div>
+
   <!-- MANAGE -->
   <div id="sec-manage" class="section">
     <div class="card">
@@ -234,7 +264,7 @@ function html(id, h) { var e=el(id); if(e) e.innerHTML=h; }
 function txt(id, t) { var e=el(id); if(e) e.textContent=t; }
 
 // ── Tabs ───────────────────────────────────────────────────
-var tabs = ['overview','users','games','viral','heatmap','blog','manage'];
+var tabs = ['overview','users','games','viral','heatmap','blog','manage','health'];
 
 function showTab(name) {
   tabs.forEach(function(t) {
@@ -247,13 +277,86 @@ function showTab(name) {
 }
 
 function loadTab(name) {
-  if (name==='overview') loadOverview();
+  if (name==='overview') 
+// ── HEALTH ─────────────────────────────────────────────────
+var healthInterval = null;
+var alerts = [];
+
+function statusColor(s) {
+  return s==='ok'?'var(--green)':s==='warning'?'#F59E0B':'var(--red)';
+}
+function statusIcon(s) {
+  return s==='ok'?'🟢':s==='warning'?'🟡':'🔴';
+}
+function statusLabel(s) {
+  return s==='ok'?'Operacional':s==='warning'?'Atenção':'Fora do ar';
+}
+
+function loadHealth() {
+  fetch(API+'/health/full')
+    .then(function(r){return r.json();})
+    .then(function(d) {
+      // Overall status
+      var overallEl = el('overall-status');
+      var color = d.overall==='healthy'?'var(--green)':d.overall==='warning'?'#F59E0B':'var(--red)';
+      var icon = d.overall==='healthy'?'🟢':d.overall==='warning'?'🟡':'🔴';
+      var label = d.overall==='healthy'?'Todos os sistemas operacionais':d.overall==='warning'?'Atenção — alguns serviços com lentidão':'Sistema com falhas';
+      overallEl.innerHTML = icon+' '+label;
+      overallEl.style.color = color;
+
+      // Last check
+      txt('last-check', 'Verificado: '+new Date(d.timestamp).toLocaleTimeString('pt-BR'));
+
+      // Services grid
+      var grid = el('services-grid');
+      grid.innerHTML = Object.values(d.services).map(function(s) {
+        var latencyColor = s.ms<500?'var(--green)':s.ms<2000?'#F59E0B':'var(--red)';
+        return '<div class="card" style="padding:16px;border-left:3px solid '+statusColor(s.status)+'">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+          '<div style="font-weight:700;font-size:14px">'+statusIcon(s.status)+' '+s.name+'</div>' +
+          '<div style="font-family:Space Mono,monospace;font-size:11px;color:'+latencyColor+'">'+s.ms+'ms</div>' +
+          '</div>' +
+          '<div style="font-size:12px;color:'+statusColor(s.status)+'">'+statusLabel(s.status)+'</div>' +
+          (s.error?'<div style="font-size:11px;color:#f87171;margin-top:6px;font-family:Space Mono,monospace">⚠️ '+s.error+'</div>':'') +
+          '</div>';
+      }).join('');
+
+      // Stats
+      if (d.stats) {
+        txt('hs-users', d.stats.users);
+        txt('hs-matches', d.stats.matches);
+        txt('hs-msgs', d.stats.messages);
+      }
+
+      // Alerts
+      var newAlerts = Object.values(d.services).filter(function(s){return s.status==='error';}).map(function(s){
+        return new Date().toLocaleTimeString('pt-BR')+' — ❌ '+s.name+': '+(s.error||'Fora do ar');
+      });
+      if (newAlerts.length>0) {
+        alerts = newAlerts.concat(alerts).slice(0,20);
+        el('alerts-log').innerHTML = alerts.map(function(a){return '<div style="margin-bottom:4px;color:var(--red)">'+a+'</div>';}).join('');
+      } else if (alerts.length===0) {
+        el('alerts-log').innerHTML = '<div style="color:var(--green)">✅ Nenhum alerta — todos os sistemas operacionais</div>';
+      }
+    })
+    .catch(function(e){ console.error('Health check failed:', e); });
+}
+
+function startHealthMonitor() {
+  loadHealth();
+  if (healthInterval) clearInterval(healthInterval);
+  healthInterval = setInterval(loadHealth, 30000);
+}
+
+loadOverview();
+startHealthMonitor();
   else if (name==='users') loadUsers();
   else if (name==='games') loadGames();
   else if (name==='viral') loadViral();
   else if (name==='heatmap') loadHeatmap();
   else if (name==='blog') loadBlog();
   else if (name==='manage') loadManage();
+  else if (name==='health') loadHealth();
 }
 
 tabs.forEach(function(t) {
@@ -471,7 +574,79 @@ function deleteUser(id, email) {
 }
 
 // Init
+
+// ── HEALTH ─────────────────────────────────────────────────
+var healthInterval = null;
+var alerts = [];
+
+function statusColor(s) {
+  return s==='ok'?'var(--green)':s==='warning'?'#F59E0B':'var(--red)';
+}
+function statusIcon(s) {
+  return s==='ok'?'🟢':s==='warning'?'🟡':'🔴';
+}
+function statusLabel(s) {
+  return s==='ok'?'Operacional':s==='warning'?'Atenção':'Fora do ar';
+}
+
+function loadHealth() {
+  fetch(API+'/health/full')
+    .then(function(r){return r.json();})
+    .then(function(d) {
+      // Overall status
+      var overallEl = el('overall-status');
+      var color = d.overall==='healthy'?'var(--green)':d.overall==='warning'?'#F59E0B':'var(--red)';
+      var icon = d.overall==='healthy'?'🟢':d.overall==='warning'?'🟡':'🔴';
+      var label = d.overall==='healthy'?'Todos os sistemas operacionais':d.overall==='warning'?'Atenção — alguns serviços com lentidão':'Sistema com falhas';
+      overallEl.innerHTML = icon+' '+label;
+      overallEl.style.color = color;
+
+      // Last check
+      txt('last-check', 'Verificado: '+new Date(d.timestamp).toLocaleTimeString('pt-BR'));
+
+      // Services grid
+      var grid = el('services-grid');
+      grid.innerHTML = Object.values(d.services).map(function(s) {
+        var latencyColor = s.ms<500?'var(--green)':s.ms<2000?'#F59E0B':'var(--red)';
+        return '<div class="card" style="padding:16px;border-left:3px solid '+statusColor(s.status)+'">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+          '<div style="font-weight:700;font-size:14px">'+statusIcon(s.status)+' '+s.name+'</div>' +
+          '<div style="font-family:Space Mono,monospace;font-size:11px;color:'+latencyColor+'">'+s.ms+'ms</div>' +
+          '</div>' +
+          '<div style="font-size:12px;color:'+statusColor(s.status)+'">'+statusLabel(s.status)+'</div>' +
+          (s.error?'<div style="font-size:11px;color:#f87171;margin-top:6px;font-family:Space Mono,monospace">⚠️ '+s.error+'</div>':'') +
+          '</div>';
+      }).join('');
+
+      // Stats
+      if (d.stats) {
+        txt('hs-users', d.stats.users);
+        txt('hs-matches', d.stats.matches);
+        txt('hs-msgs', d.stats.messages);
+      }
+
+      // Alerts
+      var newAlerts = Object.values(d.services).filter(function(s){return s.status==='error';}).map(function(s){
+        return new Date().toLocaleTimeString('pt-BR')+' — ❌ '+s.name+': '+(s.error||'Fora do ar');
+      });
+      if (newAlerts.length>0) {
+        alerts = newAlerts.concat(alerts).slice(0,20);
+        el('alerts-log').innerHTML = alerts.map(function(a){return '<div style="margin-bottom:4px;color:var(--red)">'+a+'</div>';}).join('');
+      } else if (alerts.length===0) {
+        el('alerts-log').innerHTML = '<div style="color:var(--green)">✅ Nenhum alerta — todos os sistemas operacionais</div>';
+      }
+    })
+    .catch(function(e){ console.error('Health check failed:', e); });
+}
+
+function startHealthMonitor() {
+  loadHealth();
+  if (healthInterval) clearInterval(healthInterval);
+  healthInterval = setInterval(loadHealth, 30000);
+}
+
 loadOverview();
+startHealthMonitor();
 </script>
 </body>
 </html>
