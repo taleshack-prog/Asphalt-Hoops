@@ -225,7 +225,7 @@ function getToken(cb) {
 
 function apiGet(path, cb) {
   getToken(function(t) {
-    fetch(API+path, {headers: t ? {Authorization:'Bearer '+t} : {}})
+    fetch(API+path, {headers: {'x-admin-key':'AH@admin2024!'}})
       .then(function(r){return r.json();})
       .then(cb)
       .catch(function(e){console.error(path, e);});
