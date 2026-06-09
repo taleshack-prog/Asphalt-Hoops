@@ -9,7 +9,7 @@ router.get('/search', async (req: Request, res: Response): Promise<void> => {
   try {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + ', Porto Alegre, RS, Brasil')}&format=json&limit=5`;
     const response = await fetch(url, {
-      headers: { 'User-Agent': 'AsphaltHoops/1.0 (contato@hacktechfarm.com.br)' }
+      headers: { 'Accept-Language': 'pt-BR' }
     });
     const data = await response.json() as any[];
     res.json(data);
