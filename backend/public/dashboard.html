@@ -4,614 +4,441 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Asphalt Hoops — Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Josefin+Sans:wght@400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
 <style>
-:root{--orange:#F97316;--bg:#0A0A0A;--bg2:#111;--bg3:#1A1A1A;--bg4:#222;--border:#2A2A2A;--text:#F0F0F0;--text2:#888;--text3:#444;--green:#22C55E;--blue:#3B82F6;--purple:#A855F7;--red:#EF4444;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;}
-.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.topbar-left{display:flex;align-items:center;gap:12px;}
-.topbar-logo{font-size:26px;}
-.topbar-title{font-size:19px;font-weight:800;color:var(--orange);}
-.topbar-sub{font-size:10px;color:var(--text2);font-family:'Space Mono',monospace;}
-.btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;transition:all .2s;}
-.btn:hover{border-color:var(--orange);color:var(--orange);}
-.btn-primary{background:var(--orange);color:#fff;border-color:var(--orange);}
-.btn-primary:hover{opacity:.85;color:#fff;}
-.btn-danger{border-color:var(--red);color:var(--red);}
-.main{padding:24px 28px;max-width:1600px;margin:0 auto;}
-.tabs{display:flex;gap:4px;margin-bottom:28px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;flex-wrap:wrap;}
-.tab{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);transition:all .2s;border:none;background:none;font-family:'Syne',sans-serif;}
-.tab.active{background:var(--orange);color:#fff;}
-.section{display:none;}.section.active{display:block;}
-.slabel{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:3px;text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:14px;}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
-.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s;}
-.kpi:hover{border-color:var(--orange);}
-.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent,var(--orange)),transparent);}
-.kpi-icon{font-size:22px;margin-bottom:10px;}
-.kpi-val{font-size:36px;font-weight:800;line-height:1;margin-bottom:4px;}
-.kpi-label{font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;}
-.kpi-delta{font-size:11px;color:var(--green);margin-top:6px;font-family:'Space Mono',monospace;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;}
-@media(max-width:900px){.grid2{grid-template-columns:1fr;}}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
-.card-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.card-title{font-size:14px;font-weight:700;}
-.bdg{background:var(--bg3);border:1px solid var(--border);padding:2px 10px;border-radius:20px;font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;}
-table{width:100%;border-collapse:collapse;}
-th{padding:9px 20px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;border-bottom:1px solid var(--border);}
-td{padding:11px 20px;font-size:13px;border-bottom:1px solid var(--border);}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--bg3);}
-.rank{color:var(--orange);font-weight:700;font-family:'Space Mono',monospace;}
-.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-.po{background:#F9731620;color:var(--orange);}
-.pg{background:#22C55E20;color:var(--green);}
-.pb{background:#3B82F620;color:var(--blue);}
-.pp{background:#A855F720;color:var(--purple);}
-.pr{background:#EF444420;color:var(--red);}
-.chart-wrap{padding:20px;}
-.chart-bars{display:flex;align-items:flex-end;gap:5px;height:100px;}
-.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.chart-bw{flex:1;width:100%;display:flex;align-items:flex-end;}
-.chart-b{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--orange),#C2570F);min-height:3px;}
-.chart-lbl{font-size:9px;color:var(--text2);font-family:'Space Mono',monospace;}
-.chart-v{font-size:10px;color:var(--orange);font-weight:700;font-family:'Space Mono',monospace;}
-.empty{color:var(--text3);text-align:center;padding:24px;font-family:'Space Mono',monospace;font-size:12px;}
-.loading{color:var(--text2);padding:16px 20px;font-family:'Space Mono',monospace;font-size:12px;}
-.sd{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.inp{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:10px;font-size:14px;font-family:'Syne',sans-serif;outline:none;width:100%;transition:border-color .2s;}
-.inp:focus{border-color:var(--orange);}
-textarea.inp{min-height:120px;resize:vertical;}
-.blog-item{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
-.blog-item:last-child{border-bottom:none;}
-.tree-node{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.tree-node:last-child{border-bottom:none;}
+:root {
+  --bg: #0A0A0A; --bg2: #111; --bg3: #1A1A1A;
+  --border: #1E1E1E; --orange: #F97316; --green: #22C55E;
+  --red: #EF4444; --blue: #3B82F6; --purple: #A855F7;
+  --text: #F0F0F0; --text2: #888; --text3: #444;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; }
+.header { background:var(--bg2); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; justify-content:space-between; align-items:center; }
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-icon { font-size:28px; }
+.logo-name { font-family:'Josefin Sans',sans-serif; font-weight:800; font-size:20px; color:var(--orange); }
+.logo-sub { font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; }
+.dot { width:8px; height:8px; border-radius:4px; background:var(--green); display:inline-block; margin-right:4px; }
+.btn { background:var(--bg3); border:1px solid var(--border); color:var(--text2); padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-family:'Inter',sans-serif; }
+.btn:hover { border-color:var(--orange); color:var(--orange); }
+.tabs { display:flex; gap:4px; padding:16px 24px; background:var(--bg2); border-bottom:1px solid var(--border); overflow-x:auto; }
+.tab { background:transparent; border:1px solid transparent; color:var(--text3); padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-family:'Josefin Sans',sans-serif; font-weight:600; white-space:nowrap; transition:all 0.2s; }
+.tab:hover { color:var(--text2); }
+.tab.active { background:var(--orange); color:#fff; border-color:var(--orange); }
+.content { padding:24px; max-width:1400px; margin:0 auto; }
+.section { display:none; }
+.section.active { display:block; }
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:24px; }
+.kpi { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:20px; border-top:3px solid var(--accent,var(--orange)); }
+.kpi-icon { font-size:24px; margin-bottom:8px; }
+.kpi-val { font-family:'Josefin Sans',sans-serif; font-weight:800; font-size:32px; color:var(--accent,var(--orange)); }
+.kpi-label { font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-top:4px; }
+.grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(400px,1fr)); gap:16px; margin-bottom:16px; }
+.card { background:var(--bg2); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:16px; }
+.card-header { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border); }
+.card-title { font-family:'Josefin Sans',sans-serif; font-weight:700; font-size:15px; }
+.bdg { background:var(--bg3); color:var(--orange); border:1px solid var(--border); border-radius:20px; padding:3px 10px; font-size:11px; font-family:'Space Mono',monospace; }
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; padding:10px 18px; font-size:10px; color:var(--text3); letter-spacing:1.5px; text-transform:uppercase; border-bottom:1px solid var(--border); font-weight:600; }
+td { padding:12px 18px; font-size:13px; border-bottom:1px solid var(--border); }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:var(--bg3); }
+.rank { color:var(--text3); font-family:'Space Mono',monospace; font-size:11px; width:30px; }
+.pill { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+.pill.pg { background:#16301a; color:var(--green); }
+.pill.po { background:#2c1810; color:var(--orange); }
+.pill.pb { background:#1a2030; color:var(--blue); }
+.pill.pp { background:#2a1a30; color:var(--purple); }
+.empty { color:var(--text3); font-style:italic; text-align:center; padding:24px; }
+.slabel { font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; font-weight:600; }
+.loading { color:var(--text3); text-align:center; padding:40px; font-size:13px; }
+.service-card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:16px; border-left:3px solid var(--sc,var(--green)); }
+.service-card .sname { font-weight:700; font-size:14px; margin-bottom:4px; }
+.service-card .sstatus { font-size:12px; }
+.service-card .sms { font-family:'Space Mono',monospace; font-size:11px; float:right; }
+.service-card .serr { font-size:11px; color:var(--red); margin-top:6px; font-family:'Space Mono',monospace; }
+#services-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; margin-bottom:24px; }
+input,textarea { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:10px 14px; border-radius:8px; font-size:14px; font-family:'Inter',sans-serif; outline:none; width:100%; }
+input:focus,textarea:focus { border-color:var(--orange); }
+.btn-primary { background:var(--orange); color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:700; font-family:'Josefin Sans',sans-serif; font-size:14px; }
+.btn-danger { background:#2a0a0a; color:var(--red); border:1px solid var(--red); padding:6px 14px; border-radius:6px; cursor:pointer; font-size:12px; }
+#alert-log { font-family:'Space Mono',monospace; font-size:12px; min-height:60px; }
 </style>
 </head>
 <body>
-<div class="topbar">
-  <div class="topbar-left">
-    <div class="topbar-logo">🏀</div>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🏀</div>
     <div>
-      <div class="topbar-title">Asphalt Hoops</div>
-      <div class="topbar-sub"><span class="sd"></span>ADMIN DASHBOARD</div>
+      <div class="logo-name">Asphalt Hoops</div>
+      <div class="logo-sub"><span class="dot"></span>Admin Dashboard</div>
     </div>
   </div>
   <button class="btn" id="refresh-btn">↻ Atualizar</button>
 </div>
 
-<div class="main">
-  <div class="tabs">
-    <button class="tab active" id="tab-btn-overview">📊 Visão Geral</button>
-    <button class="tab" id="tab-btn-users">👥 Usuários</button>
-    <button class="tab" id="tab-btn-games">📅 Jogos</button>
-    <button class="tab" id="tab-btn-viral">🎟️ Viralização</button>
-    <button class="tab" id="tab-btn-heatmap">🔥 Mapa de Calor</button>
-    <button class="tab" id="tab-btn-blog">📰 Blog</button>
-    <button class="tab" id="tab-btn-manage">⚙️ Gestão</button>
-    <button class="tab" id="tab-btn-health">🟢 Sistema</button>
+<div class="tabs">
+  <button class="tab active" data-tab="overview">📊 Visão Geral</button>
+  <button class="tab" data-tab="users">👥 Usuários</button>
+  <button class="tab" data-tab="games">📅 Jogos</button>
+  <button class="tab" data-tab="viral">📣 Viralização</button>
+  <button class="tab" data-tab="heatmap">🔥 Mapa de Calor</button>
+  <button class="tab" data-tab="blog">📝 Blog</button>
+  <button class="tab" data-tab="manage">⚙️ Gestão</button>
+  <button class="tab" data-tab="health">🟢 Sistema</button>
+</div>
+
+<div class="content">
+
+<!-- OVERVIEW -->
+<div id="sec-overview" class="section active">
+  <div class="kpi-grid">
+    <div class="kpi" style="--accent:#F97316"><div class="kpi-icon">👥</div><div class="kpi-val" id="k-users">—</div><div class="kpi-label">Usuários</div></div>
+    <div class="kpi" style="--accent:#22C55E"><div class="kpi-icon">📅</div><div class="kpi-val" id="k-matches">—</div><div class="kpi-label">Partidas</div></div>
+    <div class="kpi" style="--accent:#3B82F6"><div class="kpi-icon">🏀</div><div class="kpi-val" id="k-courts">—</div><div class="kpi-label">Quadras</div></div>
+    <div class="kpi" style="--accent:#A855F7"><div class="kpi-icon">💬</div><div class="kpi-val" id="k-msgs">—</div><div class="kpi-label">Mensagens</div></div>
+    <div class="kpi" style="--accent:#EC4899"><div class="kpi-icon">👫</div><div class="kpi-val" id="k-groups">—</div><div class="kpi-label">Grupos</div></div>
   </div>
-
-  <!-- OVERVIEW -->
-  <div id="sec-overview" class="section active">
-    <div class="slabel">KPIs Principais</div>
-    <div class="kpi-grid">
-      <div class="kpi" style="--accent:#F97316"><div class="kpi-icon">👥</div><div class="kpi-val" id="k-users">—</div><div class="kpi-label">USUÁRIOS</div><div class="kpi-delta" id="k-users-d"></div></div>
-      <div class="kpi" style="--accent:#22C55E"><div class="kpi-icon">📅</div><div class="kpi-val" id="k-matches">—</div><div class="kpi-label">PARTIDAS</div></div>
-      <div class="kpi" style="--accent:#3B82F6"><div class="kpi-icon">🗺️</div><div class="kpi-val" id="k-courts">—</div><div class="kpi-label">QUADRAS</div></div>
-      <div class="kpi" style="--accent:#A855F7"><div class="kpi-icon">💬</div><div class="kpi-val" id="k-msgs">—</div><div class="kpi-label">MENSAGENS</div></div>
-      <div class="kpi" style="--accent:#F59E0B"><div class="kpi-icon">👥</div><div class="kpi-val" id="k-groups">—</div><div class="kpi-label">GRUPOS</div></div>
-      <div class="kpi" style="--accent:#EC4899"><div class="kpi-icon">🎟️</div><div class="kpi-val" id="k-invites">—</div><div class="kpi-label">VIA CONVITE</div></div>
-    </div>
-    <div class="slabel">Crescimento (14 dias)</div>
-    <div class="card"><div class="card-header"><div class="card-title">📈 Novos usuários por dia</div></div><div class="chart-wrap"><div class="chart-bars" id="growth-chart"><div class="loading">Carregando...</div></div></div></div>
-    <div class="grid2">
-      <div class="card"><div class="card-header"><div class="card-title">🗺️ Quadras mais usadas</div><div class="bdg" id="b-courts">—</div></div><table><thead><tr><th>#</th><th>Quadra</th><th>Jogos</th></tr></thead><tbody id="t-courts"></tbody></table></div>
-      <div class="card"><div class="card-header"><div class="card-title">📅 Por modalidade</div><div class="bdg" id="b-mod">—</div></div><table><thead><tr><th>#</th><th>Modalidade</th><th>Total</th></tr></thead><tbody id="t-mod"></tbody></table></div>
-      <div class="card"><div class="card-header"><div class="card-title">💬 Mensagens (7d)</div></div><table><thead><tr><th>Data</th><th>Msgs</th></tr></thead><tbody id="t-chat"></tbody></table></div>
-      <div class="card"><div class="card-header"><div class="card-title">📍 Quadras por usuários</div><div class="bdg" id="b-ucourts">—</div></div><table><thead><tr><th>Quadra</th><th>Por</th></tr></thead><tbody id="t-ucourts"></tbody></table></div>
-    </div>
-  </div>
-
-  <!-- USERS -->
-  <div id="sec-users" class="section">
-    <div class="card"><div class="card-header"><div class="card-title">👥 Cadastros recentes</div><div class="bdg" id="b-newusers">—</div></div><table><thead><tr><th>Nome</th><th>Email</th><th>Data</th><th>Via</th><th>Código</th></tr></thead><tbody id="t-newusers"></tbody></table></div>
-    <div class="card"><div class="card-header"><div class="card-title">📍 Jogos por bairro</div><div class="bdg" id="b-bairro">—</div></div><table><thead><tr><th>#</th><th>Bairro</th><th>Jogos</th><th>Quadras</th></tr></thead><tbody id="t-bairro"></tbody></table></div>
-  </div>
-
-  <!-- GAMES -->
-  <div id="sec-games" class="section">
-    <div class="grid2">
-      <div class="card"><div class="card-header"><div class="card-title">📅 Todos os jogos</div><div class="bdg" id="b-allmatches">—</div></div><table><thead><tr><th>Quadra</th><th>Mod.</th><th>Data</th><th>Jog.</th></tr></thead><tbody id="t-allmatches"></tbody></table></div>
-      <div class="card"><div class="card-header"><div class="card-title">🏆 Jogadores mais ativos</div></div><table><thead><tr><th>#</th><th>Jogador</th><th>Jogos</th></tr></thead><tbody id="t-active"></tbody></table></div>
-    </div>
-  </div>
-
-  <!-- VIRAL -->
-  <div id="sec-viral" class="section">
-    <div class="grid2">
-      <div class="card"><div class="card-header"><div class="card-title">🏆 Top Convidadores</div><div class="bdg" id="b-inviters">—</div></div><table><thead><tr><th>#</th><th>Jogador</th><th>Código</th><th>Convidados</th></tr></thead><tbody id="t-inviters"></tbody></table></div>
-      <div class="card"><div class="card-header"><div class="card-title">🌳 Árvore de Viralização</div></div><div id="t-tree" class="loading" style="padding:16px 20px">Carregando...</div></div>
-    </div>
-    <div class="card"><div class="card-header"><div class="card-title">📊 Funil de Conversão</div></div>
-      <div style="padding:20px;display:flex;flex-direction:column;gap:10px">
-        <div style="background:#F9731630;border-left:4px solid var(--orange);padding:12px 16px;border-radius:6px"><b>Total:</b> <span id="f-total">—</span></div>
-        <div style="background:#22C55E20;border-left:4px solid var(--green);padding:12px 16px;border-radius:6px"><b>Via convite:</b> <span id="f-invite">—</span> <span id="f-invite-pct" style="color:var(--green);font-family:'Space Mono',monospace;font-size:12px"></span></div>
-        <div style="background:#3B82F620;border-left:4px solid var(--blue);padding:12px 16px;border-radius:6px"><b>Cadastro direto:</b> <span id="f-direct">—</span> <span id="f-direct-pct" style="color:var(--blue);font-family:'Space Mono',monospace;font-size:12px"></span></div>
-        <div style="background:#A855F720;border-left:4px solid var(--purple);padding:12px 16px;border-radius:6px"><b>Marcaram pelo menos 1 jogo:</b> <span id="f-active">—</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HEATMAP -->
-  <div id="sec-heatmap" class="section">
-    <div class="slabel">Intensidade de uso por praça</div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">🔥 Mapa de Calor</div><div style="display:flex;gap:8px;font-size:11px;align-items:center"><span style="color:#3B82F6">● Sem jogos</span><span style="color:#F59E0B">● Baixo</span><span style="color:#F97316">● Médio</span><span style="color:#EF4444">● Alto</span></div></div>
-      <div id="heatmap-div" style="height:480px"></div>
-    </div>
-    <div class="card"><div class="card-header"><div class="card-title">📊 Ranking de Praças</div><div class="bdg" id="b-heatrank">—</div></div><table><thead><tr><th>#</th><th>Praça</th><th>Bairro</th><th>Jogos</th><th>Nível</th></tr></thead><tbody id="t-heatrank"></tbody></table></div>
-  </div>
-
-  <!-- BLOG -->
-  <div id="sec-blog" class="section">
-    <div class="grid2">
-      <div class="card">
-        <div class="card-header"><div class="card-title">✏️ Novo Post</div></div>
-        <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
-          <input id="post-title" class="inp" placeholder="Título..."/>
-          <textarea id="post-content" class="inp" placeholder="Conteúdo..."></textarea>
-          <input id="post-author" class="inp" placeholder="Autor" value="Asphalt Hoops"/>
-          <input id="admin-key" class="inp" type="password" placeholder="Chave admin (ADMIN_KEY)..."/>
-          <button class="btn btn-primary" id="publish-btn" style="padding:12px">📤 Publicar</button>
-          <div id="post-msg" style="font-size:13px;text-align:center;display:none"></div>
-        </div>
-      </div>
-      <div class="card"><div class="card-header"><div class="card-title">📰 Posts</div><div class="bdg" id="b-posts">—</div></div><div id="t-posts"><div class="loading">Carregando...</div></div></div>
-    </div>
-  </div>
-
-
-  <!-- HEALTH -->
-  <div id="sec-health" class="section">
-    <div class="slabel">Status dos Serviços</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div id="overall-status" style="font-size:18px;font-weight:700;font-family:'Josefin Sans',sans-serif;color:var(--text2)">Verificando...</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div id="last-check" style="font-size:11px;color:var(--text3);font-family:'Space Mono',monospace"></div>
-        <button class="btn" id="health-refresh-btn">↻ Verificar</button>
-      </div>
-    </div>
-    <div id="services-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:28px"><div class="loading">Carregando...</div></div>
-    <div class="slabel">Estatísticas Rápidas</div>
-    <div class="kpi-grid">
-      <div class="kpi" style="--accent:#F97316"><div class="kpi-icon">👥</div><div class="kpi-val" id="hs-users">—</div><div class="kpi-label">USUÁRIOS</div></div>
-      <div class="kpi" style="--accent:#22C55E"><div class="kpi-icon">📅</div><div class="kpi-val" id="hs-matches">—</div><div class="kpi-label">PARTIDAS</div></div>
-      <div class="kpi" style="--accent:#A855F7"><div class="kpi-icon">💬</div><div class="kpi-val" id="hs-msgs">—</div><div class="kpi-label">MENSAGENS</div></div>
-    </div>
-    <div class="slabel" style="margin-top:20px">Log de Alertas</div>
-    <div id="alerts-log" class="card" style="padding:16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text2);min-height:60px">Nenhum alerta</div>
-  </div>
-
-  <!-- MANAGE -->
-  <div id="sec-manage" class="section">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">👥 Todos os Usuários</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="manage-key" class="inp" type="password" placeholder="Chave admin..." style="width:180px;padding:6px 10px;font-size:12px"/>
-          <div class="bdg" id="b-manage">—</div>
-        </div>
-      </div>
-      <table><thead><tr><th>Nome</th><th>Email</th><th>Data</th><th>Via</th><th>Código</th><th>Ação</th></tr></thead><tbody id="t-manage"></tbody></table>
-    </div>
+  <div class="grid2">
+    <div class="card"><div class="card-header"><div class="card-title">📈 Crescimento</div><div class="bdg" id="b-growth">—</div></div><table><thead><tr><th>Data</th><th>Novos</th><th>Total</th></tr></thead><tbody id="t-growth"></tbody></table></div>
+    <div class="card"><div class="card-header"><div class="card-title">🏆 Quadras mais ativas</div><div class="bdg" id="b-courts">—</div></div><table><thead><tr><th>#</th><th>Quadra</th><th>Jogos</th></tr></thead><tbody id="t-courts"></tbody></table></div>
   </div>
 </div>
 
+<!-- USERS -->
+<div id="sec-users" class="section">
+  <div class="card"><div class="card-header"><div class="card-title">👥 Cadastros recentes</div><div class="bdg" id="b-newusers">—</div></div><table><thead><tr><th>Nome</th><th>Email</th><th>Data</th><th>Via</th><th>Código</th></tr></thead><tbody id="t-newusers"></tbody></table></div>
+  <div class="card"><div class="card-header"><div class="card-title">📍 Jogos por bairro</div></div><table><thead><tr><th>#</th><th>Bairro</th><th>Jogos</th><th>Quadras</th></tr></thead><tbody id="t-neighborhood"></tbody></table></div>
+</div>
+
+<!-- GAMES -->
+<div id="sec-games" class="section">
+  <div class="grid2">
+    <div class="card"><div class="card-header"><div class="card-title">📅 Todos os jogos</div><div class="bdg" id="b-allmatches">—</div></div><table><thead><tr><th>Quadra</th><th>Mod.</th><th>Data</th><th>Jog.</th></tr></thead><tbody id="t-allmatches"></tbody></table></div>
+    <div class="card"><div class="card-header"><div class="card-title">🏆 Jogadores mais ativos</div></div><table><thead><tr><th>#</th><th>Jogador</th><th>Jogos</th></tr></thead><tbody id="t-active"></tbody></table></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="card-header"><div class="card-title">⚡ Modalidades</div><div class="bdg" id="b-mod">—</div></div><table><thead><tr><th>#</th><th>Modalidade</th><th>Jogos</th></tr></thead><tbody id="t-mod"></tbody></table></div>
+    <div class="card"><div class="card-header"><div class="card-title">💬 Mensagens por dia</div></div><table><thead><tr><th>Data</th><th>Msgs</th></tr></thead><tbody id="t-chat"></tbody></table></div>
+  </div>
+</div>
+
+<!-- VIRAL -->
+<div id="sec-viral" class="section">
+  <div class="card"><div class="card-header"><div class="card-title">🌱 Top convidadores</div><div class="bdg" id="b-inviters">—</div></div><table><thead><tr><th>#</th><th>Usuário</th><th>Convidados</th><th>Código</th></tr></thead><tbody id="t-inviters"></tbody></table></div>
+  <div class="card"><div class="card-header"><div class="card-title">🌳 Árvore de convites</div></div><div style="padding:16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text2)" id="t-tree">Carregando...</div></div>
+</div>
+
+<!-- HEATMAP -->
+<div id="sec-heatmap" class="section">
+  <div class="card"><div class="card-header"><div class="card-title">🏀 Quadras adicionadas por usuários</div><div class="bdg" id="b-ucourts">—</div></div><table><thead><tr><th>Quadra</th><th>Adicionada por</th></tr></thead><tbody id="t-ucourts"></tbody></table></div>
+  <div class="card"><div class="card-header"><div class="card-title">📍 Atividade por bairro</div></div><table><thead><tr><th>#</th><th>Bairro</th><th>Jogos</th><th>Quadras</th></tr></thead><tbody id="t-heatmap"></tbody></table></div>
+</div>
+
+<!-- BLOG -->
+<div id="sec-blog" class="section">
+  <div class="card" style="padding:20px;margin-bottom:16px">
+    <div class="slabel">Nova Publicação</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <input id="post-title" placeholder="Título do post..."/>
+      <textarea id="post-content" rows="5" placeholder="Conteúdo..."></textarea>
+      <input id="post-author" placeholder="Autor (ex: HTF Team)"/>
+      <div style="display:flex;gap:10px">
+        <button class="btn-primary" onclick="publishPost()">Publicar</button>
+        <button class="btn" onclick="loadBlog()">↻ Atualizar</button>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><div class="card-title">📝 Posts publicados</div><div class="bdg" id="b-posts">—</div></div><table><thead><tr><th>Título</th><th>Autor</th><th>Data</th><th>Ação</th></tr></thead><tbody id="t-posts"></tbody></table></div>
+</div>
+
+<!-- MANAGE -->
+<div id="sec-manage" class="section">
+  <div class="card"><div class="card-header"><div class="card-title">👥 Todos os usuários</div><div class="bdg" id="b-allusers">—</div></div><table><thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Cadastro</th><th>Ação</th></tr></thead><tbody id="t-allusers"></tbody></table></div>
+</div>
+
+<!-- HEALTH -->
+<div id="sec-health" class="section">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div id="overall-status" style="font-size:20px;font-weight:700;font-family:'Josefin Sans',sans-serif">Verificando...</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="last-check" style="font-size:11px;color:var(--text3);font-family:'Space Mono',monospace"></span>
+      <button class="btn" onclick="loadHealth()">↻ Verificar</button>
+    </div>
+  </div>
+  <div id="services-grid"><div class="loading">Carregando serviços...</div></div>
+  <div class="slabel" style="margin-top:20px">Estatísticas</div>
+  <div class="kpi-grid">
+    <div class="kpi" style="--accent:#F97316"><div class="kpi-icon">👥</div><div class="kpi-val" id="hs-users">—</div><div class="kpi-label">Usuários</div></div>
+    <div class="kpi" style="--accent:#22C55E"><div class="kpi-icon">📅</div><div class="kpi-val" id="hs-matches">—</div><div class="kpi-label">Partidas</div></div>
+    <div class="kpi" style="--accent:#A855F7"><div class="kpi-icon">💬</div><div class="kpi-val" id="hs-msgs">—</div><div class="kpi-label">Mensagens</div></div>
+  </div>
+  <div class="slabel">Log de Alertas</div>
+  <div class="card" style="padding:16px"><div id="alert-log" style="color:var(--text3);font-size:13px">Nenhum alerta</div></div>
+</div>
+
+</div><!-- /content -->
+
 <script>
 var API = 'https://asphalt-hoops-production.up.railway.app/api';
-var TOKEN = '';
-var heatmapInited = false;
-
-// ── Helpers ────────────────────────────────────────────────
-function getToken(cb) {
-  cb('ADMIN_KEY:AH@admin2024!');
-}
-
-function apiGet(path, cb) {
-  getToken(function(t) {
-    fetch(API+path+'?_='+Date.now(), {headers: {'x-admin-key':'AH@admin2024!', 'Cache-Control':'no-cache'}})
-      .then(function(r){return r.json();})
-      .then(cb)
-      .catch(function(e){console.error(path, e);});
-  });
-}
-
-function apiDelete(path, key, cb) {
-  fetch(API+path, {method:'DELETE', headers:{'x-admin-key':key}})
-    .then(function(r){return r.json();})
-    .then(cb)
-    .catch(function(e){console.error(e);});
-}
-
-function apiPost(path, body, key, cb) {
-  var headers = {'Content-Type':'application/json'};
-  if (key) headers['x-admin-key'] = key;
-  fetch(API+path, {method:'POST', headers:headers, body:JSON.stringify(body)})
-    .then(function(r){return r.json();})
-    .then(cb)
-    .catch(function(e){console.error(e);});
-}
+var ADMIN = 'AH@admin2024!';
+var alerts = [];
 
 function el(id) { return document.getElementById(id); }
-function html(id, h) { var e=el(id); if(e) e.innerHTML=h; }
-function txt(id, t) { var e=el(id); if(e) e.textContent=t; }
+function txt(id, v) { if(el(id)) el(id).textContent = v; }
+function html(id, v) { if(el(id)) el(id).innerHTML = v; }
 
-// ── Tabs ───────────────────────────────────────────────────
-var tabs = ['overview','users','games','viral','heatmap','blog','manage','health'];
+function apiGet(path, cb) {
+  fetch(API + path + '?_=' + Date.now(), {
+    headers: { 'x-admin-key': ADMIN, 'Cache-Control': 'no-cache' }
+  })
+  .then(function(r) { return r.json(); })
+  .then(cb)
+  .catch(function(e) { console.error('API error:', path, e); });
+}
 
-function showTab(name) {
-  tabs.forEach(function(t) {
-    var s = el('sec-'+t);
-    var b = el('tab-btn-'+t);
-    if (s) s.className = 'section' + (t===name?' active':'');
-    if (b) b.className = 'tab' + (t===name?' active':'');
+function apiPost(path, body, cb) {
+  fetch(API + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': ADMIN },
+    body: JSON.stringify(body)
+  })
+  .then(function(r) { return r.json(); })
+  .then(cb || function(){})
+  .catch(function(e) { console.error('API error:', path, e); });
+}
+
+function apiDelete(path, cb) {
+  fetch(API + path, {
+    method: 'DELETE',
+    headers: { 'x-admin-key': ADMIN }
+  })
+  .then(function(r) { return r.json(); })
+  .then(cb || function(){})
+  .catch(function(e) { console.error('API error:', path, e); });
+}
+
+// TABS
+document.querySelectorAll('.tab').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var tab = btn.getAttribute('data-tab');
+    document.querySelectorAll('.tab').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+    btn.classList.add('active');
+    if(el('sec-'+tab)) el('sec-'+tab).classList.add('active');
+    loadTab(tab);
   });
-  loadTab(name);
-}
-
-function loadTab(name) {
-  if (name==='overview') loadOverview();
-  else if (name==='users') loadUsers();
-  else if (name==='games') loadGames();
-  else if (name==='viral') loadViral();
-  else if (name==='heatmap') loadHeatmap();
-  else if (name==='blog') loadBlog();
-  else if (name==='manage') loadManage();
-  else if (name==='health') loadHealth();
-}
-
-// HEALTH
-var healthAlerts = [];
-var healthTimer = null;
-
-function scColor(s) { return s==='ok'?'var(--green)':s==='warning'?'#F59E0B':'var(--red)'; }
-function scIcon(s) { return s==='ok'?'🟢':s==='warning'?'🟡':'🔴'; }
-function scLabel(s) { return s==='ok'?'Operacional':s==='warning'?'Atenção':'Fora do ar'; }
-
-function loadHealth() {
-  fetch(API+'/health/full')
-    .then(function(r){ return r.json(); })
-    .then(function(d) {
-      var overallEl = el('overall-status');
-      if (d.overall==='healthy') {
-        overallEl.innerHTML = '🟢 Todos os sistemas operacionais';
-        overallEl.style.color = 'var(--green)';
-      } else if (d.overall==='warning') {
-        overallEl.innerHTML = '🟡 Atenção — lentidão detectada';
-        overallEl.style.color = '#F59E0B';
-      } else {
-        overallEl.innerHTML = '🔴 Sistema com falhas';
-        overallEl.style.color = 'var(--red)';
-      }
-      txt('last-check', 'Atualizado: '+new Date(d.timestamp).toLocaleTimeString('pt-BR'));
-      var grid = el('services-grid');
-      if (grid) {
-        grid.innerHTML = Object.values(d.services).map(function(s) {
-          var lc = s.ms<500?'var(--green)':s.ms<2000?'#F59E0B':'var(--red)';
-          return '<div class="card" style="padding:16px;border-left:3px solid '+scColor(s.status)+'">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
-            '<div style="font-weight:700;font-size:14px">'+scIcon(s.status)+' '+s.name+'</div>' +
-            '<div style="font-family:Space Mono,monospace;font-size:11px;color:'+lc+'">'+s.ms+'ms</div>' +
-            '</div>' +
-            '<div style="font-size:12px;color:'+scColor(s.status)+'">'+scLabel(s.status)+'</div>' +
-            (s.error?'<div style="font-size:11px;color:#f87171;margin-top:4px">⚠️ '+s.error+'</div>':'') +
-            '</div>';
-        }).join('');
-      }
-      if (d.stats) { txt('hs-users',d.stats.users); txt('hs-matches',d.stats.matches); txt('hs-msgs',d.stats.messages); }
-      var newAlerts = Object.values(d.services).filter(function(s){ return s.status==='error'; }).map(function(s){
-        return new Date().toLocaleTimeString('pt-BR')+' — ❌ '+s.name+': '+(s.error||'Fora do ar');
-      });
-      if (newAlerts.length>0) {
-        healthAlerts = newAlerts.concat(healthAlerts).slice(0,20);
-        el('alerts-log').innerHTML = healthAlerts.map(function(a){ return '<div style="color:var(--red);margin-bottom:4px">'+a+'</div>'; }).join('');
-      } else {
-        el('alerts-log').innerHTML = '<div style="color:var(--green)">✅ Nenhum alerta — todos os sistemas operacionais</div>';
-      }
-    }).catch(function(e){ console.error('Health check error:', e); });
-}
-
-var healthRefBtn = el('health-refresh-btn');
-if (healthRefBtn) { healthRefBtn.addEventListener('click', loadHealth); }
-setInterval(function() {
-  var healthTab = el('sec-health');
-  if (healthTab && healthTab.classList.contains('active')) { loadHealth(); }
-}, 30000);
-
-loadOverview();
-}
-
-tabs.forEach(function(t) {
-  var b = el('tab-btn-'+t);
-  if (b) b.addEventListener('click', function(){ showTab(t); });
 });
 
-el('refresh-btn').addEventListener('click', function() { loadTab(tabs.find(function(t){ return el('sec-'+t).classList.contains('active'); })||'overview'); });
+function loadTab(name) {
+  if (name === 'overview') loadOverview();
+  else if (name === 'users') loadUsers();
+  else if (name === 'games') loadGames();
+  else if (name === 'viral') loadViral();
+  else if (name === 'heatmap') loadHeatmap();
+  else if (name === 'blog') loadBlog();
+  else if (name === 'manage') loadManage();
+  else if (name === 'health') loadHealth();
+}
 
-// ── OVERVIEW ───────────────────────────────────────────────
+el('refresh-btn').addEventListener('click', function() {
+  var active = document.querySelector('.tab.active');
+  if (active) loadTab(active.getAttribute('data-tab'));
+});
+
+// OVERVIEW
 function loadOverview() {
-  apiGet('/dashboard/users/count', function(u) {
-    txt('k-users', u.count||'—');
-    txt('k-invites', u.via_invite||'—');
-    if (u.today>0) txt('k-users-d', '+'+u.today+' hoje');
-  });
-  apiGet('/dashboard/matches/count', function(d){ txt('k-matches', d.count||'—'); });
-  apiGet('/dashboard/courts/count', function(d){ txt('k-courts', d.count||'—'); });
-  apiGet('/dashboard/messages/count', function(d){ txt('k-msgs', d.count||'—'); txt('k-groups', d.groups||'—'); });
-
+  apiGet('/dashboard/users/count', function(d) { txt('k-users', d.count || '—'); });
+  apiGet('/dashboard/matches/count', function(d) { txt('k-matches', d.count || '—'); });
+  apiGet('/dashboard/courts/count', function(d) { txt('k-courts', d.count || '—'); });
+  apiGet('/dashboard/messages/count', function(d) { txt('k-msgs', d.count || '—'); txt('k-groups', d.groups || '—'); });
   apiGet('/dashboard/users/growth', function(d) {
-    var el2 = el('growth-chart');
-    if (!d.days||!d.days.length) { el2.innerHTML='<div class="empty">Sem dados</div>'; return; }
-    var max = 1;
-    d.days.forEach(function(x){ if(+x.count>max) max=+x.count; });
-    el2.innerHTML = d.days.map(function(x){
-      return '<div class="chart-col"><div class="chart-v">'+(x.count||'')+'</div><div class="chart-bw"><div class="chart-b" style="height:'+Math.max((x.count/max)*100,3)+'%"></div></div><div class="chart-lbl">'+x.label+'</div></div>';
-    }).join('');
+    txt('b-growth', (d.rows && d.rows.length || 0) + ' dias');
+    html('t-growth', d.rows && d.rows.length ? d.rows.map(function(r) {
+      return '<tr><td style="font-family:Space Mono,monospace;font-size:11px">'+r.date+'</td><td><span class="pill pg">+'+r.new_users+'</span></td><td>'+r.total+'</td></tr>';
+    }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
   });
-
   apiGet('/dashboard/courts/top', function(d) {
-    txt('b-courts', (d.rows&&d.rows.length||0)+' quadras');
-    html('t-courts', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td><span class="pill pg">'+r.match_count+'</span></td></tr>'; }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
-  });
-
-  apiGet('/dashboard/matches/modalities', function(d) {
-    var b={'1x1':'pb','2x2':'pp','3x3':'po','5x5':'pg'};
-    txt('b-mod', (d.rows&&d.rows.length||0)+' tipos');
-    html('t-mod', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td><span class="pill '+(b[r.modality]||'po')+'">'+r.modality+'</span></td><td>'+r.count+'</td></tr>'; }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
-  });
-
-  apiGet('/dashboard/messages/daily', function(d) {
-    html('t-chat', d.rows&&d.rows.length ? d.rows.map(function(r){ return '<tr><td style="font-family:Space Mono,monospace;font-size:12px">'+r.date+'</td><td>'+r.count+'</td></tr>'; }).join('') : '<tr><td colspan="2" class="empty">Sem dados</td></tr>');
-  });
-
-  apiGet('/dashboard/courts/user-added', function(d) {
-    txt('b-ucourts', (d.rows&&d.rows.length||0)+' novas');
-    html('t-ucourts', d.rows&&d.rows.length ? d.rows.map(function(r){ return '<tr><td>'+r.court_name+'</td><td>'+(r.added_by_name||'Anônimo')+'</td></tr>'; }).join('') : '<tr><td colspan="2" class="empty">Nenhuma</td></tr>');
+    txt('b-courts', (d.rows && d.rows.length || 0) + ' quadras');
+    html('t-courts', d.rows && d.rows.length ? d.rows.map(function(r, i) {
+      return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td><span class="pill pg">'+r.match_count+'</span></td></tr>';
+    }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
   });
 }
 
-// ── USERS ──────────────────────────────────────────────────
+// USERS
 function loadUsers() {
   apiGet('/dashboard/users/recent', function(d) {
-    txt('b-newusers', (d.rows&&d.rows.length||0)+' recentes');
-    html('t-newusers', d.rows&&d.rows.length ? d.rows.map(function(r){ return '<tr><td>'+r.name+'</td><td style="font-size:11px;color:var(--text2)">'+r.email+'</td><td style="font-family:Space Mono,monospace;font-size:11px;color:var(--text2)">'+new Date(r.created_at).toLocaleDateString('pt-BR')+'</td><td>'+(r.invited_by?'<span class="pill po">Convite</span>':'<span class="pill pb">Direto</span>')+'</td><td style="font-family:Space Mono,monospace;font-size:12px;color:var(--orange)">'+r.invite_code+'</td></tr>'; }).join('') : '<tr><td colspan="5" class="empty">Sem usuários</td></tr>');
+    txt('b-newusers', (d.rows && d.rows.length || 0) + ' usuários');
+    html('t-newusers', d.rows && d.rows.length ? d.rows.map(function(r) {
+      return '<tr><td>'+r.name+'</td><td style="font-size:11px;color:var(--text2)">'+r.email+'</td>' +
+        '<td style="font-family:Space Mono,monospace;font-size:11px">'+new Date(r.created_at).toLocaleDateString('pt-BR')+'</td>' +
+        '<td>'+(r.invited_by ? '<span class="pill po">Convite</span>' : '<span class="pill pb">Direto</span>')+'</td>' +
+        '<td style="font-family:Space Mono,monospace;font-size:12px;color:var(--orange)">'+r.invite_code+'</td></tr>';
+    }).join('') : '<tr><td colspan="5" class="empty">Sem usuários</td></tr>');
   });
   apiGet('/dashboard/courts/by-neighborhood', function(d) {
-    txt('b-bairro', (d.rows&&d.rows.length||0)+' regiões');
-    html('t-bairro', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.neighborhood+'</td><td><span class="pill pg">'+r.match_count+'</span></td><td>'+r.court_count+'</td></tr>'; }).join('') : '<tr><td colspan="4" class="empty">Sem dados</td></tr>');
+    html('t-neighborhood', d.rows && d.rows.length ? d.rows.map(function(r, i) {
+      return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.neighborhood+'</td><td>'+r.match_count+'</td><td>'+r.court_count+'</td></tr>';
+    }).join('') : '<tr><td colspan="4" class="empty">Sem dados</td></tr>');
   });
 }
 
-// ── GAMES ──────────────────────────────────────────────────
+// GAMES
 function loadGames() {
   apiGet('/dashboard/matches/all', function(d) {
-    var b={'1x1':'pb','2x2':'pp','3x3':'po','5x5':'pg'};
-    txt('b-allmatches', (d.rows&&d.rows.length||0)+' jogos');
-    html('t-allmatches', d.rows&&d.rows.length ? d.rows.map(function(r){ return '<tr><td>'+r.court_name+'</td><td><span class="pill '+(b[r.modality]||'po')+'">'+r.modality+'</span></td><td style="font-family:Space Mono,monospace;font-size:11px">'+new Date(r.scheduled_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</td><td>'+r.player_count+'/'+r.max_players+'</td></tr>'; }).join('') : '<tr><td colspan="4" class="empty">Sem jogos</td></tr>');
+    txt('b-allmatches', (d.rows && d.rows.length || 0) + ' partidas');
+    html('t-allmatches', d.rows && d.rows.length ? d.rows.map(function(r) {
+      return '<tr><td>'+r.court_name+'</td><td><span class="pill po">'+r.modality+'</span></td>' +
+        '<td style="font-size:11px;font-family:Space Mono,monospace">'+new Date(r.scheduled_at).toLocaleString('pt-BR')+'</td>' +
+        '<td>'+r.player_count+'</td></tr>';
+    }).join('') : '<tr><td colspan="4" class="empty">Sem partidas</td></tr>');
   });
   apiGet('/dashboard/users/most-active', function(d) {
-    html('t-active', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td><span class="pill po">'+r.match_count+' jogos</span></td></tr>'; }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
+    html('t-active', d.rows && d.rows.length ? d.rows.map(function(r, i) {
+      return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td><span class="pill pg">'+r.match_count+'</span></td></tr>';
+    }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
+  });
+  apiGet('/dashboard/matches/modalities', function(d) {
+    txt('b-mod', (d.rows && d.rows.length || 0) + ' tipos');
+    var colors = {'1x1':'pb','2x2':'pp','3x3':'po','5x5':'pg'};
+    html('t-mod', d.rows && d.rows.length ? d.rows.map(function(r, i) {
+      return '<tr><td class="rank">'+(i+1)+'</td><td><span class="pill '+(colors[r.modality]||'po')+'">'+r.modality+'</span></td><td>'+r.count+'</td></tr>';
+    }).join('') : '<tr><td colspan="3" class="empty">Sem dados</td></tr>');
+  });
+  apiGet('/dashboard/messages/daily', function(d) {
+    html('t-chat', d.rows && d.rows.length ? d.rows.map(function(r) {
+      return '<tr><td style="font-family:Space Mono,monospace;font-size:11px">'+r.date+'</td><td>'+r.count+'</td></tr>';
+    }).join('') : '<tr><td colspan="2" class="empty">Sem dados</td></tr>');
   });
 }
 
-// ── VIRAL ──────────────────────────────────────────────────
+// VIRAL
 function loadViral() {
   apiGet('/dashboard/users/inviters', function(d) {
-    txt('b-inviters', (d.rows&&d.rows.length||0)+' jogadores');
-    html('t-inviters', d.rows&&d.rows.length ? d.rows.map(function(r,i){ return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td style="font-family:Space Mono,monospace;font-size:12px;color:var(--orange)">'+r.invite_code+'</td><td><span class="pill po">'+r.invited_count+'</span></td></tr>'; }).join('') : '<tr><td colspan="4" class="empty">Nenhum convite ainda</td></tr>');
+    txt('b-inviters', (d.rows && d.rows.length || 0) + ' usuários');
+    html('t-inviters', d.rows && d.rows.length ? d.rows.map(function(r, i) {
+      return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td><span class="pill pg">'+r.invited_count+'</span></td><td style="font-family:Space Mono,monospace;font-size:12px;color:var(--orange)">'+r.invite_code+'</td></tr>';
+    }).join('') : '<tr><td colspan="4" class="empty">Sem dados</td></tr>');
   });
   apiGet('/dashboard/users/tree', function(d) {
-    var treeEl = el('t-tree');
-    if (!d.rows||!d.rows.length) { treeEl.innerHTML='<div class="empty">Sem convites ainda</div>'; return; }
-    treeEl.className='';
-    treeEl.innerHTML = d.rows.map(function(r) {
-      var indent = r.level>0 ? '&nbsp;&nbsp;&nbsp;'.repeat(r.level)+'└─&nbsp;' : '';
-      return '<div class="tree-node"><span style="font-family:Space Mono,monospace;font-size:12px;color:var(--text3)">'+indent+'</span><span style="font-weight:600">'+r.name+'</span><span style="font-family:Space Mono,monospace;font-size:11px;color:var(--orange);margin-left:8px">'+r.invite_code+'</span><span style="margin-left:auto;color:var(--green);font-size:11px">'+(r.invited_count>0?'▶ '+r.invited_count+' convidados':'')+'</span></div>';
-    }).join('');
-  });
-  apiGet('/dashboard/users/count', function(u) {
-    var total=u.count||0, invite=u.via_invite||0, direct=total-invite;
-    txt('f-total', total);
-    txt('f-invite', invite);
-    txt('f-direct', direct);
-    if (total>0) {
-      txt('f-invite-pct', Math.round(invite/total*100)+'%');
-      txt('f-direct-pct', Math.round(direct/total*100)+'%');
-    }
-  });
-  apiGet('/dashboard/users/most-active', function(d) {
-    txt('f-active', d.rows&&d.rows.length||0);
+    html('t-tree', d.tree ? '<pre style="white-space:pre-wrap;font-size:11px;line-height:1.8">'+d.tree+'</pre>' : '<span style="color:var(--text3)">Sem dados</span>');
   });
 }
 
-// ── HEATMAP ────────────────────────────────────────────────
-var heatMap = null;
-
+// HEATMAP
 function loadHeatmap() {
-  if (!heatMap) {
-    setTimeout(function() {
-      heatMap = L.map('heatmap-div').setView([-30.0353,-51.2177], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap',maxZoom:19}).addTo(heatMap);
-      fetchHeatData();
-    }, 150);
-  } else {
-    fetchHeatData();
-  }
-}
-
-function fetchHeatData() {
-  apiGet('/dashboard/courts/heatmap', function(d) {
-    if (!d.rows||!d.rows.length) return;
-    var maxCount = 1;
-    d.rows.forEach(function(r){ if(+r.match_count>maxCount) maxCount=+r.match_count; });
-
-    d.rows.forEach(function(r) {
-      var count = +r.match_count;
-      var pct = count/maxCount;
-      var color = pct>=0.7?'#EF4444':pct>=0.4?'#F97316':pct>=0.1?'#F59E0B':'#3B82F6';
-      var radius = count===0?7:Math.max(10,Math.min(30,count*4+8));
-      var opacity = count===0?0.25:0.75;
-      L.circleMarker([+r.lat,+r.lng],{radius:radius,fillColor:color,fillOpacity:opacity,color:'#fff',weight:count===0?1:2})
-        .addTo(heatMap)
-        .bindPopup('<b>🏀 '+r.name+'</b><br><span style="color:'+color+';font-weight:700">'+count+' jogo'+(count!==1?'s':'')+'</span>');
-    });
-
-    txt('b-heatrank', d.rows.length+' quadras');
-    html('t-heatrank', d.rows.map(function(r,i) {
-      var count=+r.match_count;
-      var lvl=count>=5?'pr po':count>=2?'po':count>=1?'pb':'';
-      var lbl=count>=5?'🔥 Alta':count>=2?'⚡ Média':count>=1?'💧 Baixa':'❄️ Nenhum';
-      var bairro=(r.address||'').split('—')[1];
-      return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.name+'</td><td style="font-size:12px;color:var(--text2)">'+(bairro?bairro.trim():'—')+'</td><td><span class="pill pg">'+count+'</span></td><td><span class="pill '+lvl+'">'+lbl+'</span></td></tr>';
-    }).join(''));
+  apiGet('/dashboard/courts/user-added', function(d) {
+    txt('b-ucourts', (d.rows && d.rows.length || 0) + ' quadras');
+    html('t-ucourts', d.rows && d.rows.length ? d.rows.map(function(r) {
+      return '<tr><td>'+r.court_name+'</td><td>'+(r.added_by_name || 'Anônimo')+'</td></tr>';
+    }).join('') : '<tr><td colspan="2" class="empty">Nenhuma</td></tr>');
+  });
+  apiGet('/dashboard/courts/by-neighborhood', function(d) {
+    html('t-heatmap', d.rows && d.rows.length ? d.rows.map(function(r, i) {
+      return '<tr><td class="rank">'+(i+1)+'</td><td>'+r.neighborhood+'</td><td>'+r.match_count+'</td><td>'+r.court_count+'</td></tr>';
+    }).join('') : '<tr><td colspan="4" class="empty">Sem dados</td></tr>');
   });
 }
 
-// ── BLOG ───────────────────────────────────────────────────
+// BLOG
 function loadBlog() {
-  fetch(API+'/posts').then(function(r){return r.json();}).then(function(posts) {
-    txt('b-posts', posts.length+' posts');
-    var container = el('t-posts');
-    if (!posts.length) { container.innerHTML='<div class="empty">Nenhum post ainda</div>'; return; }
-    container.innerHTML = posts.map(function(p) {
-      return '<div class="blog-item"><div style="flex:1"><div style="font-size:14px;font-weight:700;margin-bottom:4px">'+p.title+'</div><div style="font-size:11px;color:var(--text2);font-family:Space Mono,monospace">'+new Date(p.created_at).toLocaleDateString('pt-BR')+' • '+p.author+'</div><div style="font-size:12px;color:var(--text3);margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+p.content+'</div></div><button class="btn btn-danger" data-id="'+p.id+'" style="padding:4px 10px;font-size:11px;flex-shrink:0">🗑️</button></div>';
-    }).join('');
-    container.querySelectorAll('[data-id]').forEach(function(btn) {
-      btn.addEventListener('click', function() { deletePost(this.getAttribute('data-id')); });
-    });
+  fetch(API + '/posts?_=' + Date.now())
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var posts = Array.isArray(d) ? d : (d.rows || []);
+    txt('b-posts', posts.length + ' posts');
+    html('t-posts', posts.length ? posts.map(function(p) {
+      return '<tr><td>'+p.title+'</td><td>'+p.author+'</td>' +
+        '<td style="font-size:11px;font-family:Space Mono,monospace">'+new Date(p.created_at).toLocaleDateString('pt-BR')+'</td>' +
+        '<td><button class="btn-danger" onclick="deletePost('+p.id+')">Excluir</button></td></tr>';
+    }).join('') : '<tr><td colspan="4" class="empty">Nenhum post</td></tr>');
+  }).catch(function(e) { console.error('Blog error:', e); });
+}
+
+function publishPost() {
+  var title = el('post-title').value.trim();
+  var content = el('post-content').value.trim();
+  var author = el('post-author').value.trim() || 'HTF Team';
+  if (!title || !content) { alert('Preenche título e conteúdo'); return; }
+  fetch(API + '/posts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': ADMIN },
+    body: JSON.stringify({ title: title, content: content, author: author })
+  }).then(function() {
+    el('post-title').value = ''; el('post-content').value = ''; el('post-author').value = '';
+    loadBlog();
   });
 }
 
 function deletePost(id) {
-  var key = el('admin-key').value.trim();
-  if (!key) { alert('Informe a chave admin'); return; }
-  if (!confirm('Deletar este post?')) return;
-  fetch(API+'/posts/'+id,{method:'DELETE',headers:{'x-admin-key':key}}).then(function(){loadBlog();});
+  if (!confirm('Excluir post?')) return;
+  fetch(API + '/posts/' + id, { method: 'DELETE', headers: { 'x-admin-key': ADMIN } })
+  .then(function() { loadBlog(); });
 }
 
-el('publish-btn').addEventListener('click', function() {
-  var title = el('post-title').value.trim();
-  var content = el('post-content').value.trim();
-  var author = el('post-author').value.trim();
-  var key = el('admin-key').value.trim();
-  var msg = el('post-msg');
-  if (!title||!content) { msg.style.display='block';msg.style.color='#f87171';msg.textContent='Título e conteúdo obrigatórios'; return; }
-  if (!key) { msg.style.display='block';msg.style.color='#f87171';msg.textContent='Informe a chave admin'; return; }
-  fetch(API+'/posts',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':key},body:JSON.stringify({title:title,content:content,author:author||'Asphalt Hoops'})})
-    .then(function(r){return r.json();})
-    .then(function(d) {
-      if (d.error) { msg.style.display='block';msg.style.color='#f87171';msg.textContent='Erro: '+d.error; return; }
-      msg.style.display='block';msg.style.color='var(--green)';msg.textContent='✅ Post publicado!';
-      el('post-title').value=''; el('post-content').value='';
-      loadBlog();
-      setTimeout(function(){msg.style.display='none';},3000);
-    });
-});
-
-// ── MANAGE ─────────────────────────────────────────────────
+// MANAGE
 function loadManage() {
   apiGet('/dashboard/users/all', function(d) {
-    txt('b-manage', (d.rows&&d.rows.length||0)+' usuários');
-    var tbody = el('t-manage');
-    if (!d.rows||!d.rows.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">Sem usuários</td></tr>'; return; }
-    tbody.innerHTML = d.rows.map(function(r) {
-      return '<tr><td>'+r.name+'</td><td style="font-size:11px;color:var(--text2)">'+r.email+'</td><td style="font-family:Space Mono,monospace;font-size:11px;color:var(--text2)">'+new Date(r.created_at).toLocaleDateString('pt-BR')+'</td><td>'+(r.invited_by?'<span class="pill po">Convite</span>':'<span class="pill pb">Direto</span>')+'</td><td style="font-family:Space Mono,monospace;font-size:12px;color:var(--orange)">'+r.invite_code+'</td><td><button class="btn btn-danger" data-id="'+r.id+'" data-email="'+r.email+'" style="padding:4px 10px;font-size:11px">🗑️</button></td></tr>';
-    }).join('');
-    tbody.querySelectorAll('[data-id]').forEach(function(btn) {
-      btn.addEventListener('click', function() { deleteUser(this.getAttribute('data-id'), this.getAttribute('data-email')); });
-    });
+    var users = d.rows || [];
+    txt('b-allusers', users.length + ' usuários');
+    html('t-allusers', users.length ? users.map(function(u) {
+      return '<tr><td style="font-family:Space Mono,monospace;font-size:11px">'+u.id+'</td>' +
+        '<td>'+u.name+'</td><td style="font-size:11px;color:var(--text2)">'+u.email+'</td>' +
+        '<td style="font-size:11px;font-family:Space Mono,monospace">'+new Date(u.created_at).toLocaleDateString('pt-BR')+'</td>' +
+        '<td><button class="btn-danger" onclick="deleteUser('+u.id+')">Excluir</button></td></tr>';
+    }).join('') : '<tr><td colspan="5" class="empty">Nenhum usuário</td></tr>');
   });
 }
 
-function deleteUser(id, email) {
-  var key = el('manage-key').value.trim();
-  if (!key) { alert('Informe a chave admin'); return; }
-  if (!confirm('Deletar usuário '+email+'?\n\nIsso remove seus jogos e mensagens.')) return;
-  fetch(API+'/dashboard/users/'+id,{method:'DELETE',headers:{'x-admin-key':key}})
-    .then(function(r){return r.json();})
-    .then(function(d) {
-      if (d.error) { alert('Erro: '+d.error); return; }
-      loadManage();
-    });
+function deleteUser(id) {
+  if (!confirm('Excluir usuário ID ' + id + '? Isso não pode ser desfeito.')) return;
+  apiDelete('/dashboard/users/' + id, function() { loadManage(); });
+}
+
+// HEALTH
+function loadHealth() {
+  fetch(API + '/health/full?_=' + Date.now())
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var colors = { ok: 'var(--green)', warning: '#F59E0B', error: 'var(--red)' };
+    var icons = { ok: '🟢', warning: '🟡', error: '🔴' };
+    var labels = { ok: 'Operacional', warning: 'Atenção', error: 'Fora do ar' };
+    var overall = el('overall-status');
+    overall.textContent = (icons[d.overall] || '🟡') + ' ' + (d.overall === 'healthy' ? 'Todos os sistemas operacionais' : d.overall === 'warning' ? 'Atenção — lentidão detectada' : 'Sistema com falhas');
+    overall.style.color = colors[d.overall] || '#F59E0B';
+    txt('last-check', 'Atualizado: ' + new Date(d.timestamp).toLocaleTimeString('pt-BR'));
+    if (d.services) {
+      html('services-grid', Object.values(d.services).map(function(s) {
+        var c = colors[s.status] || 'var(--text3)';
+        return '<div class="service-card" style="--sc:'+c+'">'+
+          '<div class="sname">'+icons[s.status]+' '+s.name+'<span class="sms" style="color:'+(s.ms<500?'var(--green)':s.ms<2000?'#F59E0B':'var(--red)')+'">'+s.ms+'ms</span></div>'+
+          '<div class="sstatus" style="color:'+c+'">'+labels[s.status]+'</div>'+
+          (s.error ? '<div class="serr">⚠️ '+s.error+'</div>' : '') +
+          '</div>';
+      }).join(''));
+    }
+    if (d.stats) { txt('hs-users', d.stats.users); txt('hs-matches', d.stats.matches); txt('hs-msgs', d.stats.messages); }
+    var newAlerts = d.services ? Object.values(d.services).filter(function(s) { return s.status === 'error'; }).map(function(s) {
+      return new Date().toLocaleTimeString('pt-BR') + ' — ❌ ' + s.name + ': ' + (s.error || 'Fora do ar');
+    }) : [];
+    if (newAlerts.length) {
+      alerts = newAlerts.concat(alerts).slice(0, 20);
+      html('alert-log', alerts.map(function(a) { return '<div style="color:var(--red);margin-bottom:4px">'+a+'</div>'; }).join(''));
+    } else {
+      html('alert-log', '<span style="color:var(--green)">✅ Nenhum alerta — todos os sistemas operacionais</span>');
+    }
+  }).catch(function(e) { console.error('Health check error:', e); });
 }
 
 // Init
-
-// HEALTH
-var healthAlerts = [];
-var healthTimer = null;
-
-function scColor(s) { return s==='ok'?'var(--green)':s==='warning'?'#F59E0B':'var(--red)'; }
-function scIcon(s) { return s==='ok'?'🟢':s==='warning'?'🟡':'🔴'; }
-function scLabel(s) { return s==='ok'?'Operacional':s==='warning'?'Atenção':'Fora do ar'; }
-
-function loadHealth() {
-  fetch(API+'/health/full')
-    .then(function(r){ return r.json(); })
-    .then(function(d) {
-      var overallEl = el('overall-status');
-      if (d.overall==='healthy') {
-        overallEl.innerHTML = '🟢 Todos os sistemas operacionais';
-        overallEl.style.color = 'var(--green)';
-      } else if (d.overall==='warning') {
-        overallEl.innerHTML = '🟡 Atenção — lentidão detectada';
-        overallEl.style.color = '#F59E0B';
-      } else {
-        overallEl.innerHTML = '🔴 Sistema com falhas';
-        overallEl.style.color = 'var(--red)';
-      }
-      txt('last-check', 'Atualizado: '+new Date(d.timestamp).toLocaleTimeString('pt-BR'));
-      var grid = el('services-grid');
-      if (grid) {
-        grid.innerHTML = Object.values(d.services).map(function(s) {
-          var lc = s.ms<500?'var(--green)':s.ms<2000?'#F59E0B':'var(--red)';
-          return '<div class="card" style="padding:16px;border-left:3px solid '+scColor(s.status)+'">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
-            '<div style="font-weight:700;font-size:14px">'+scIcon(s.status)+' '+s.name+'</div>' +
-            '<div style="font-family:Space Mono,monospace;font-size:11px;color:'+lc+'">'+s.ms+'ms</div>' +
-            '</div>' +
-            '<div style="font-size:12px;color:'+scColor(s.status)+'">'+scLabel(s.status)+'</div>' +
-            (s.error?'<div style="font-size:11px;color:#f87171;margin-top:4px">⚠️ '+s.error+'</div>':'') +
-            '</div>';
-        }).join('');
-      }
-      if (d.stats) { txt('hs-users',d.stats.users); txt('hs-matches',d.stats.matches); txt('hs-msgs',d.stats.messages); }
-      var newAlerts = Object.values(d.services).filter(function(s){ return s.status==='error'; }).map(function(s){
-        return new Date().toLocaleTimeString('pt-BR')+' — ❌ '+s.name+': '+(s.error||'Fora do ar');
-      });
-      if (newAlerts.length>0) {
-        healthAlerts = newAlerts.concat(healthAlerts).slice(0,20);
-        el('alerts-log').innerHTML = healthAlerts.map(function(a){ return '<div style="color:var(--red);margin-bottom:4px">'+a+'</div>'; }).join('');
-      } else {
-        el('alerts-log').innerHTML = '<div style="color:var(--green)">✅ Nenhum alerta — todos os sistemas operacionais</div>';
-      }
-    }).catch(function(e){ console.error('Health check error:', e); });
-}
-
-var healthRefBtn = el('health-refresh-btn');
-if (healthRefBtn) { healthRefBtn.addEventListener('click', loadHealth); }
-setInterval(function() {
-  var healthTab = el('sec-health');
-  if (healthTab && healthTab.classList.contains('active')) { loadHealth(); }
-}, 30000);
-
 loadOverview();
+setInterval(function() {
+  var active = document.querySelector('.tab.active');
+  if (active && active.getAttribute('data-tab') === 'health') loadHealth();
+}, 30000);
 </script>
 </body>
 </html>
