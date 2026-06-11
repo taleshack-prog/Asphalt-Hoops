@@ -1,7 +1,6 @@
 import { Router, Response } from 'express';
 import { pool } from '../db';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
-import { getIO } from '../socket';
 
 const router = Router();
 
@@ -46,19 +45,7 @@ router.post('/:id/join', authMiddleware, async (req: AuthRequest, res: Response)
     const playerCount = Number(countResult.rows[0].count);
     const maxPlayers = match.rows[0].max_players;
 
-    // Emite notificação de confirmação no chat da partida
-    const io = getIO();
-    if (io) {
-      const msg = {
-        id: Date.now(),
-        message: `🏀 ${userName} confirmou presença! ${playerCount}/${maxPlayers} jogadores`,
-        name: 'Sistema',
-        user_id: 0,
-        created_at: new Date().toISOString(),
-        is_system: true,
-      };
-      io.to(`match_${matchId}`).emit('new_message', msg);
-    }
+    // Notificação salva no DB — socket emite via index.ts ao salvar msg
 
     // Salva notificação para o criador da partida
     if (match.rows[0].created_by !== req.userId) {
