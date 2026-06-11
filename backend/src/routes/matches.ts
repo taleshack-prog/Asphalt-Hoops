@@ -1,119 +1,94 @@
 import { Router, Response } from 'express';
 import { pool } from '../db';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
+import { getIO } from '../socket';
 
 const router = Router();
 
-// POST /api/matches — cria partida
+// POST /api/matches — criar partida
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   const { court_id, modality, scheduled_at, max_players } = req.body;
-
-  if (!court_id || !scheduled_at) {
-    res.status(400).json({ error: 'court_id e scheduled_at são obrigatórios' });
-    return;
-  }
-
+  if (!court_id || !modality || !scheduled_at) { res.status(400).json({ error: 'court_id, modality e scheduled_at obrigatórios' }); return; }
   try {
     const result = await pool.query(
-      `INSERT INTO matches (court_id, created_by, modality, scheduled_at, max_players)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [court_id, req.userId, modality || '3x3', scheduled_at, max_players || 6]
+      'INSERT INTO matches (court_id, created_by, modality, scheduled_at, max_players) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [court_id, req.userId, modality, scheduled_at, max_players || 6]
     );
-
     const match = result.rows[0];
-
     // Criador entra automaticamente
-    await pool.query(
-      'INSERT INTO match_players (match_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-      [match.id, req.userId]
-    );
-
+    await pool.query('INSERT INTO match_players (match_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [match.id, req.userId]);
     res.status(201).json(match);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro interno' });
-  }
+  } catch(e) { console.error(e); res.status(500).json({ error: 'Erro interno' }); }
 });
 
-// POST /api/matches/:id/join — entrar na partida
+// POST /api/matches/:id/join — confirmar presença
 router.post('/:id/join', authMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
-  const matchId = parseInt(req.params.id);
-
+  const matchId = Number(req.params.id);
   try {
-    const match = await pool.query('SELECT * FROM matches WHERE id = $1', [matchId]);
-    if (!match.rows[0]) {
-      res.status(404).json({ error: 'Partida não encontrada' });
-      return;
-    }
-
-    const playerCount = await pool.query(
-      'SELECT COUNT(*) FROM match_players WHERE match_id = $1',
-      [matchId]
-    );
-
-    if (parseInt(playerCount.rows[0].count) >= match.rows[0].max_players) {
-      res.status(400).json({ error: 'Partida cheia' });
-      return;
-    }
-
-    await pool.query(
-      'INSERT INTO match_players (match_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-      [matchId, req.userId]
-    );
-
-    res.json({ message: 'Entrou na partida' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro interno' });
-  }
-});
-
-// GET /api/matches/:id — detalhe da partida + jogadores + mensagens
-router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
-  const matchId = req.params.id;
-
-  try {
+    // Verifica se partida existe e não está lotada
     const match = await pool.query(
-      `SELECT m.*, c.name as court_name, c.lat, c.lng, u.name as creator_name
-       FROM matches m
-       JOIN courts c ON m.court_id = c.id
-       JOIN users u ON m.created_by = u.id
-       WHERE m.id = $1`,
-      [matchId]
+      `SELECT m.*, c.name as court_name,
+              (SELECT COUNT(*) FROM match_players WHERE match_id = m.id) as player_count
+       FROM matches m JOIN courts c ON c.id = m.court_id
+       WHERE m.id = $1`, [matchId]
     );
-
-    if (!match.rows[0]) {
-      res.status(404).json({ error: 'Partida não encontrada' });
-      return;
+    if (!match.rows[0]) { res.status(404).json({ error: 'Partida não encontrada' }); return; }
+    if (Number(match.rows[0].player_count) >= match.rows[0].max_players) {
+      res.status(400).json({ error: 'Partida lotada' }); return;
     }
 
-    const players = await pool.query(
-      `SELECT u.id, u.name FROM match_players mp
-       JOIN users u ON mp.user_id = u.id
-       WHERE mp.match_id = $1`,
-      [matchId]
-    );
+    await pool.query('INSERT INTO match_players (match_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [matchId, req.userId]);
 
-    const messages = await pool.query(
-      `SELECT cm.id, cm.message, cm.created_at, u.name
-       FROM chat_messages cm
-       JOIN users u ON cm.user_id = u.id
-       WHERE cm.match_id = $1
-       ORDER BY cm.created_at ASC
-       LIMIT 100`,
-      [matchId]
-    );
+    // Busca dados do usuário e contagem atualizada
+    const userResult = await pool.query('SELECT name, nickname FROM users WHERE id = $1', [req.userId]);
+    const countResult = await pool.query('SELECT COUNT(*) FROM match_players WHERE match_id = $1', [matchId]);
+    const userName = userResult.rows[0]?.nickname || userResult.rows[0]?.name || 'Alguém';
+    const playerCount = Number(countResult.rows[0].count);
+    const maxPlayers = match.rows[0].max_players;
+
+    // Emite notificação de confirmação no chat da partida
+    const io = getIO();
+    if (io) {
+      const msg = {
+        id: Date.now(),
+        message: `🏀 ${userName} confirmou presença! ${playerCount}/${maxPlayers} jogadores`,
+        name: 'Sistema',
+        user_id: 0,
+        created_at: new Date().toISOString(),
+        is_system: true,
+      };
+      io.to(`match_${matchId}`).emit('new_message', msg);
+    }
+
+    // Salva notificação para o criador da partida
+    if (match.rows[0].created_by !== req.userId) {
+      await pool.query(
+        `INSERT INTO chat_messages (match_id, user_id, message, is_general)
+         VALUES ($1, $2, $3, FALSE)`,
+        [matchId, req.userId, `🏀 ${userName} confirmou presença! ${playerCount}/${maxPlayers} jogadores`]
+      );
+    }
 
     res.json({
-      match: match.rows[0],
-      players: players.rows,
-      messages: messages.rows,
+      message: 'Presença confirmada!',
+      player_count: playerCount,
+      max_players: maxPlayers
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro interno' });
-  }
+  } catch(e) { console.error(e); res.status(500).json({ error: 'Erro interno' }); }
+});
+
+// GET /api/matches/:id — busca partida com mensagens
+router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const msgs = await pool.query(
+      `SELECT cm.id, cm.message, cm.created_at, u.name, u.id as user_id
+       FROM chat_messages cm
+       LEFT JOIN users u ON u.id = cm.user_id
+       WHERE cm.match_id = $1 ORDER BY cm.created_at ASC LIMIT 100`,
+      [req.params.id]
+    );
+    res.json({ messages: msgs.rows });
+  } catch(e) { res.status(500).json({ error: 'Erro interno' }); }
 });
 
 export default router;

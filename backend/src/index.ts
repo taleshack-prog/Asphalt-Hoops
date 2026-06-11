@@ -14,6 +14,8 @@ import dashboardRoutes from './routes/dashboard';
 import postsRoutes from './routes/posts';
 import messagesRoutes from './routes/messages';
 import oscarRoutes from './routes/oscar';
+import feedbackRoutes from './routes/feedback';
+import passwordResetRoutes from './routes/password_reset';
 import geocodeRoutes from './routes/geocode';
 import healthFullRoutes from './routes/health_full';
 
@@ -36,6 +38,8 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/oscar', oscarRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/auth', passwordResetRoutes);
 app.use('/api/geocode', geocodeRoutes);
 app.use('/api/health', healthFullRoutes);
 
